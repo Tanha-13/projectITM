@@ -12,7 +12,7 @@ function Hero() {
         <div className="container mx-auto">
           <div className="flex flex-col lg:flex-row items-center text-center lg:text-start lg:grid-cols-2 gap-x-40">
             <div className="flex-1">
-              <h1 className="text-3xl xl:text-6xl font-bold">
+              <h1 className="text-3xl xl:text-6xl font-bold text-transparent bg-clip-text bg-[linear-gradient(to_right,_#094074,_#3d9373)]">
                 Effortless Collaboration{" "}
                 <span className="hidden md:inline">and Progress Tracking </span>{" "}
                 for Final Year Success
@@ -27,7 +27,7 @@ function Hero() {
                   your academic success every step of the way
                 </span>
               </p>
-              <button className="px-7 lg:px-8  py-2 lg:py-3 rounded-full bg-[#094074] text-white hover:bg-[#246953] transition duration-150 font-bold mb-2 lg:mb-0">
+              <button className="px-7 lg:px-8  py-2 lg:py-3 rounded-full bg-[#094074] text-white hover:bg-[#246953] transition duration-150 font-semibold mb-2 lg:mb-0">
                 <Link to="/register" className="flex items-center gap-3">
                   Get Started <FaLongArrowAltRight />
                 </Link>
