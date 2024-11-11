@@ -1,3 +1,4 @@
+import Features from "../../components/Features";
 import Hero from "../../components/Hero";
 
 function Home() {
@@ -6,11 +7,12 @@ function Home() {
       {/* 
     <div className="p-4 md:p-14">
         <div className="container mx-auto">
-        
+
         </div>
     </div>
      */}
       <Hero />
+      <Features/>
     </>
   );
 }

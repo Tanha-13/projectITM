@@ -12,12 +12,12 @@ function Hero() {
         <div className="container mx-auto">
           <div className="flex flex-col lg:flex-row items-center text-center lg:text-start lg:grid-cols-2 gap-x-40">
             <div className="flex-1">
-              <h1 className="text-3xl xl:text-6xl font-bold text-transparent bg-clip-text bg-[linear-gradient(to_right,_#094074,_#3d9373)]">
+              <h1 className="text-3xl xl:text-5xl font-bold text-transparent bg-clip-text bg-[linear-gradient(to_right,_#094074,_#3d9373)]">
                 Effortless Collaboration{" "}
                 <span className="hidden md:inline">and Progress Tracking </span>{" "}
                 for Final Year Success
               </h1>
-              <p className="my-7">
+              <p className="my-7 text-gray-600">
                 ProjectITM empowers students and supervisors with seamless
                 collaboration, real-time tracking, and intuitive task
                 management.
