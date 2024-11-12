@@ -1,4 +1,5 @@
 import Features from "../../components/Features";
+import FrequentQuestion from "../../components/FrequentQuestion";
 import Hero from "../../components/Hero";
 
 function Home() {
@@ -13,6 +14,7 @@ function Home() {
      */}
       <Hero />
       <Features/>
+      <FrequentQuestion/>
     </>
   );
 }
