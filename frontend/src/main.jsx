@@ -6,27 +6,31 @@ import Home from "./pages/Home/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
 import Register from "./pages/Register/Register.jsx";
 import LandingPageLayout from "./layout/LandingPageLayout.jsx";
+import ForgetPassword from "./pages/Login/ForgetPassword.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPageLayout/>,
+    element: <LandingPageLayout />,
     children: [
       {
-        path:'/',
-        element:<Home/>
+        path: "/",
+        element: <Home />,
       },
       {
         path: "/login",
         element: <Login />,
       },
       {
+        path: "/forgetPassword",
+        element: <ForgetPassword />,
+      },
+      {
         path: "/register",
         element: <Register />,
       },
-    ]
+    ],
   },
-  
 ]);
 
 createRoot(document.getElementById("root")).render(

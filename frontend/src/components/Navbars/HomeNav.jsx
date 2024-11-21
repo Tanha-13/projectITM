@@ -24,7 +24,7 @@ function HomeNav() {
               </Link>
               <Link
                 to="/register"
-                className="px-7 lg:px-8  py-2 lg:py-3 bg-[#094074] text-white font-semibold"
+                className="px-7 lg:px-8  py-2 lg:py-3 bg-primary text-white font-semibold"
               >
                 Register
               </Link>

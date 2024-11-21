@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function AcademicInfoForm({ formData, handleChange }) {
   return (
     <div className="space-y-6">
@@ -84,8 +86,8 @@ export default function AcademicInfoForm({ formData, handleChange }) {
           onChange={(e) => handleChange('supervisor', e.target.value)}
         >
           <option value="">Select supervisor</option>
-          <option value="dr-smith">Nusrat Jahan</option>
-          <option value="prof-johnson">Nafees Imran</option>
+          <option value="dr-smith">Dr. Smith</option>
+          <option value="prof-johnson">Prof. Johnson</option>
           <option value="dr-williams">Dr. Williams</option>
         </select>
       </div>

@@ -1,6 +1,36 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 export default function PersonalInfoForm({ formData, handleChange }) {
+  const currentYear = new Date().getFullYear();
+  const startYear = 2020;
+  
+  const semesterOptions = useMemo(() => {
+    const options = [];
+    for (let year = startYear; year <= currentYear + 1; year++) {
+      options.push({ value: `Spring ${year}`, label: `Spring ${year}` });
+      options.push({ value: `Fall ${year}`, label: `Fall ${year}` });
+    }
+    return options;
+  }, [currentYear]);
+
+  const batchOptions = useMemo(() => {
+    const options = [];
+    let batchCount = 1;
+    for (let year = startYear; year <= currentYear + 1; year++) {
+      options.push({ 
+        value: `Spring ${year} Batch ${batchCount.toString().padStart(2, '0')}`, 
+        label: `Spring ${year} Batch ${batchCount.toString().padStart(2, '0')}` 
+      });
+      batchCount++;
+      options.push({ 
+        value: `Fall ${year} Batch ${batchCount.toString().padStart(2, '0')}`, 
+        label: `Fall ${year} Batch ${batchCount.toString().padStart(2, '0')}` 
+      });
+      batchCount++;
+    }
+    return options;
+  }, [currentYear]);
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -95,13 +125,34 @@ export default function PersonalInfoForm({ formData, handleChange }) {
             onChange={(e) => handleChange('semester', e.target.value)}
           >
             <option value="">Select semester</option>
-            <option value="1">1st Semester</option>
-            <option value="2">2nd Semester</option>
-            <option value="3">3rd Semester</option>
-            <option value="4">4th Semester</option>
+            {semesterOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
       </div>
+      <div>
+        <label htmlFor="batch" className="block text-sm font-medium text-gray-700">
+          Batch
+        </label>
+        <select
+          id="batch"
+          name="batch"
+          required
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          value={formData.batch}
+          onChange={(e) => handleChange('batch', e.target.value)}
+        >
+          <option value="">Select batch</option>
+          {batchOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
+    </div>
   );
 }
