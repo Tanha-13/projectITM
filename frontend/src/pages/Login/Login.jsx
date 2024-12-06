@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaRegEye,FaRegEyeSlash  } from "react-icons/fa";
 import login from "../../assets/img/login.png";
+import { Button } from "@/components/ui/button";
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({
@@ -130,6 +131,7 @@ export default function LoginForm() {
                 >
                   Login
                 </button>
+                <Button variant="authButton">Login</Button>
               </div>
             </form>
             <div className="my-8 text-center text-sm xl:text-base text-gray-600 ">

@@ -10,21 +10,25 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+          "relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[linear-gradient(to_right,_#094074,_#246953)]",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
           "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        ghost: 
+        "hover:bg-accent hover:text-accent-foreground",
+        link: 
+        "text-primary underline-offset-4 hover:underline",
+        authButton: "bg-gradient-color-right relative flex justify-center py-2 px-4 border border-transparent font-medium rounded-md text-white"
+
       },
       size: {
         default: "h-9 px-4 py-2",
         sm: "h-8 rounded-md px-3 text-xs",
         lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        icon:"h-9 w-9"
       },
     },
     defaultVariants: {

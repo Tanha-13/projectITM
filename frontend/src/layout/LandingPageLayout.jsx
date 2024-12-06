@@ -5,9 +5,9 @@ import Footer from "../components/Footer"
 function LandingPageLayout() {
   return (
     <>
-      <HomeNav/>
+      {/* <HomeNav/> */}
       <Outlet/>
-      <Footer/>
+      {/* <Footer/> */}
     </>
   )
 }

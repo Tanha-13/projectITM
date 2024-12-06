@@ -9,7 +9,7 @@ export default {
   	extend: {
   		colors: {
   			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
+  				DEFAULT: "#094074",
   				foreground: 'hsl(var(--primary-foreground))'
   			},
   			secondary: {
@@ -47,6 +47,16 @@ export default {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
+  			},
+  			sidebar: {
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
   			}
   		},
   		backgroundImage: {
