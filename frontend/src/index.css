@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 @layer base {
   body {
     font-family: "Nunito", sans-serif;
@@ -86,3 +87,4 @@
     @apply bg-background text-foreground;
   }
 }
+

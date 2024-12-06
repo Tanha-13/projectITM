@@ -1,5 +1,6 @@
 import { CustomTrigger } from "@/components/CustomTrigger";
 import SideNav from "@/components/Navbars/SideNav";
+import UserNav from "@/components/Navbars/UserNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -114,6 +115,7 @@ export default function StudentDashboard() {
         <nav className="shadow-sm py-5">
           <div className="container flex justify-between items-center">
               <CustomTrigger />
+              <UserNav/>
             {/* <div className="hidden md:flex items-center space-x-4">
             </div> */}
           </div>
