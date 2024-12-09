@@ -1,93 +1,114 @@
 import { CustomTrigger } from "@/components/CustomTrigger";
-import SideNav from "@/components/Navbars/SideNav"
+import SideNav from "@/components/Navbars/SideNav";
+import UserNav from "@/components/Navbars/UserNav";
+import SearchInput from "@/components/SearchInput";
+
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { FaUsersCog,FaUserPlus,FaUsers,FaUserFriends,FaProjectDiagram,FaBell,FaUserCog,FaCog } from "react-icons/fa";
+import {
+  FaUsersCog,
+  FaUserPlus,
+  FaUsers,
+  FaUserFriends,
+  FaProjectDiagram,
+  FaBell,
+  FaUserCog,
+  FaCog,
+  FaHome,
+} from "react-icons/fa";
+import { Outlet } from "react-router-dom";
 
-
-function adminDashboard() {
+function AdminDashboard() {
   const navItems = [
     {
       id:1,
-      title: "Supervisors",
-      url: "#",
-      icon: FaUsersCog,
-      subItems:[
-        {
-          id:1.1,
-          title: "Add",
-          url: "#",
-          icon:FaUserPlus 
-        },
-        {
-          id:1.2,
-          title: "View",
-          url: "#",
-          icon:FaUsers  
-        },
-      ]
+      title:"Overview",
+      url:"/admin",
+      icon:FaHome
+
     },
     {
-    id:2,
+      id: 2,
+      title: "Supervisors",
+      url: "/admin/supervisor/all",
+      icon: FaUsersCog,
+      subItems: [
+        {
+          id: 2.1,
+          title: "Add",
+          url: "/admin/supervisor/add",
+          icon: FaUserPlus,
+        },
+        {
+          id: 2.2,
+          title: "View",
+          url: "/admin/supervisor/all",
+          icon: FaUsers,
+        },
+      ],
+    },
+    {
+      id: 3,
       title: "Students",
       url: "#",
       icon: FaUserFriends,
-      subItems:[
+      subItems: [
         {
-          id:1.1,
+          id: 3.1,
           title: "Review",
           url: "#",
-          icon:FaUserPlus 
+          icon: FaUserPlus,
         },
         {
-          id:1.2,
+          id: 3.2,
           title: "View",
           url: "#",
-          icon:FaUsers  
+          icon: FaUsers,
         },
-      ]
+      ],
     },
     {
-      id:3,
+      id: 4,
       title: "Projects",
       url: "#",
-      icon:  FaProjectDiagram,
+      icon: FaProjectDiagram,
     },
     {
-      id:4,
+      id: 5,
       title: "Notifications",
       url: "#",
       icon: FaBell,
     },
     {
-      id:6,
+      id: 6,
       title: "Supports",
       url: "#",
       icon: FaUserCog,
     },
     {
-      id:7,
+      id: 7,
       title: "Settings",
       url: "#",
-      icon: FaCog ,
+      icon: FaCog,
     },
+  ];
 
-  ]
   return (
     <SidebarProvider>
-      <SideNav navItems = {navItems} />
+      <SideNav navItems={navItems} />
       <menu className="w-full">
         <nav className="shadow-sm py-5">
-          <div className="container flex justify-between items-center">
+          <div className="container flex items-center justify-between gap-7">
+            <div className="flex items-center gap-2 lg:gap-5">
               <CustomTrigger />
-            {/* <div className="hidden md:flex items-center space-x-4">
-            </div> */}
-            
+              <SearchInput />
+            </div>
+            <UserNav />
           </div>
         </nav>
-          <p>Admin</p>
+        <Outlet/>
       </menu>
     </SidebarProvider>
-  )
+  );
 }
 
-export default adminDashboard
+export default AdminDashboard

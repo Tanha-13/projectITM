@@ -35,8 +35,8 @@ function SideNav({ navItems }) {
               {navItems.map((items) => (
                 <SidebarMenuItem className="mb-4" key={items.id}>
                   <SidebarMenuButton>
-                    <Link to={items.url} className="flex items-center gap-4">
-                      <items.icon className="text-[#094074] md:text-xl" />
+                    <Link to={`${items.url}`} className="flex items-center gap-4">
+                      <items.icon className="text-primary md:text-xl" />
                       <span className="font-bold text-base">{items.title}</span>
                     </Link>
                   </SidebarMenuButton>

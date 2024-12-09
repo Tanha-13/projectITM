@@ -16,8 +16,8 @@ function UserNav() {
     avatar: "#",
   };
   return (
-    <DropdownMenu >
-      <DropdownMenuTrigger className="flex justify-center items-center gap-4 outline-none cursor-pointer">
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex justify-center items-center gap-4 outline-none cursor-pointer pe-1">
           <Avatar className="h-11 w-11 rounded-full">
             <AvatarImage src={user.avatar} alt={user.name} />
             <AvatarFallback className="rounded-full">CN</AvatarFallback>

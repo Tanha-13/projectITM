@@ -4,7 +4,7 @@ import { FaRegEye,FaRegEyeSlash  } from "react-icons/fa";
 import login from "../../assets/img/login.png";
 import { Button } from "@/components/ui/button";
 
-export default function LoginForm() {
+export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",

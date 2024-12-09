@@ -4,7 +4,7 @@ import AcademicInfoForm from '../../components/Registration/AcademicInfoForm';
 
 const steps = ['Personal Information', 'Academic Information'];
 
-export default function RegistrationForm() {
+export default function Register() {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
     firstName: '',
