@@ -26,32 +26,35 @@ function AddSupervisor() {
 
   const validateForm = () => {
     let newErrors = {};
-    Object.keys(formData).forEach(key => {
-      if(!formData[key]){
-        newErrors[key] = `${key.charAt(0).toUpperCase() + key.slice(1)} is required`
+    Object.keys(formData).forEach((key) => {
+      if (!formData[key]) {
+        newErrors[key] = `${
+          key.charAt(0).toUpperCase() + key.slice(1)
+        } is required`;
       }
-    })
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    if(validateForm()){
-      console.log('Form submitted:', formData);
+    if (validateForm()) {
+      console.log("Form submitted:", formData);
       // send data to backend
     }
   };
   const handleInputChange = (e) => {
-    const {name, value} = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
-      ...prev, [name]:value
-    }))
+      ...prev,
+      [name]: value,
+    }));
   };
   const handleSelectChange = (value) => {
     setFormData((prev) => ({
-      ...prev, 
-      gender:value
-    }))
+      ...prev,
+      gender: value,
+    }));
   };
 
   const handleGeneratePassword = () => {
@@ -62,13 +65,12 @@ function AddSupervisor() {
     }));
   };
   return (
-    <div className="p-2 min-h-screen bg-gray-50">
-      <Card className="p-5">
+    <div className="p-2 md:p-10 min-h-screen bg-gray-50">
+      <Card className="p-5 max-w-7xl mx-auto w-full">
         <h1 className="text-3xl font-semibold md:text-4xl">Add Supervisor</h1>
-      <Separator/>
-      <CardContent className="my-10">
-        <form onSubmit={handleSubmit}>
-          <div className="grid md:grid-cols-2 gap-4">
+        <Separator />
+        <CardContent className="my-10">
+          <form onSubmit={handleSubmit}>
             <div>
               <Label htmlFor="firstName">First Name</Label>
               <Input
@@ -77,7 +79,9 @@ function AddSupervisor() {
                 placeholder="Enter First Name"
                 value={formData.firstName}
                 onChange={handleInputChange}
-                className={`rounded-none ${errors.firstName ? "border-red-500" : ""}`}
+                className={`rounded-none ${
+                  errors.firstName ? "border-red-500" : ""
+                }`}
               />
               {errors.firstName && (
                 <p className="text-red-600 text-sm mt-1">{errors.firstName}</p>
@@ -91,14 +95,14 @@ function AddSupervisor() {
                 value={formData.lastName}
                 onChange={handleInputChange}
                 placeholder="Enter last name"
-                className={`rounded-none ${errors.lastName ? "border-red-500" : ""}`}
+                className={`rounded-none ${
+                  errors.lastName ? "border-red-500" : ""
+                }`}
               />
               {errors.lastName && (
                 <p className="text-red-600 text-sm mt-1">{errors.lastName}</p>
               )}
             </div>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
@@ -108,7 +112,9 @@ function AddSupervisor() {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="Enter email"
-                className={` rounded-none ${errors.email ? "border-red-500" : ""}`}
+                className={` rounded-none ${
+                  errors.email ? "border-red-500" : ""
+                }`}
               />
               {errors.email && (
                 <p className="text-red-600 text-sm mt-1">{errors.email}</p>
@@ -122,7 +128,9 @@ function AddSupervisor() {
                 value={formData.designation}
                 onChange={handleInputChange}
                 placeholder="Enter designation"
-                className={` rounded-none ${errors.designation ? "border-red-500" : ""}`}
+                className={` rounded-none ${
+                  errors.designation ? "border-red-500" : ""
+                }`}
               />
               {errors.designation && (
                 <p className="text-red-600 text-sm mt-1">
@@ -130,47 +138,68 @@ function AddSupervisor() {
                 </p>
               )}
             </div>
-          </div>
-          <div>
-            <Label htmlFor="gender">Gender</Label>
-            <Select onValueChange={handleSelectChange} value={formData.gender}>
-              <SelectTrigger
-                className={`rounded-none ${errors.gender ? "border-red-500" : ""}`}
+            <div>
+              <Label htmlFor="gender">Gender</Label>
+              <Select
+                onValueChange={handleSelectChange}
+                value={formData.gender}
               >
-                <SelectValue placeholder="Select gender" />
-              </SelectTrigger>
-              <SelectContent className="text-black">
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.gender && (
-              <p className="text-red-600 text-sm mt-1">{errors.gender}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="tempPassword">Temporary Password</Label>
-            <div className="flex flex-col lg:flex-row justify-center items-center gap-3">
-              <Input
-                id="tempPassword"
-                name="tempPassword"
-                placeholder="temporary password"
-                value={formData.tempPassword}
-                onChange={handleInputChange}
-                readOnly
-                className={` rounded-none w-full lg:w-4/5 ${errors.tempPassword ? "border-red-500" : ""}`}
-              />
-              <Button className="lg:w-1/5 px-3 py-4 rounded-full bg-gray-800 text-white hover:bg-secondary hover:text-white" variant="outline" onClick={handleGeneratePassword}>
-                Generate Password
-              </Button>
+                <SelectTrigger
+                  className={`rounded-none ${
+                    errors.gender ? "border-red-500" : ""
+                  }`}
+                >
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent className="text-black">
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.gender && (
+                <p className="text-red-600 text-sm mt-1">{errors.gender}</p>
+              )}
             </div>
-            {errors.tempPassword && <p className="text-red-600 text-sm mt-1">{errors.tempPassword}</p>}
-          </div>
-        </form>
-        <Button type="submit" className="w-full py-5 mt-10 text-base rounded-none">Add Supervisor<span className="hidden md:inline">& Send Credentials</span></Button>
-      </CardContent>
-    </Card>
+            <div>
+              <Label htmlFor="tempPassword">Temporary Password</Label>
+              <div className="flex flex-col lg:flex-row justify-center items-center gap-3">
+                <Input
+                  id="tempPassword"
+                  name="tempPassword"
+                  placeholder="temporary password"
+                  value={formData.tempPassword}
+                  onChange={handleInputChange}
+                  readOnly
+                  className={` rounded-none w-full lg:w-4/5 ${
+                    errors.tempPassword ? "border-red-500" : ""
+                  }`}
+                />
+                <Button size=""
+                  className="lg:w-1/5 rounded-none lg:rounded-full bg-gray-800 text-white hover:bg-secondary hover:text-white"
+                  variant="outline"
+                  onClick={handleGeneratePassword}
+                >
+                  Generate
+                </Button>
+              </div>
+              {errors.tempPassword && (
+                <p className="text-red-600 text-sm mt-1">
+                  {errors.tempPassword}
+                </p>
+              )}
+            </div>
+          </form>
+          <Button
+            type="submit"
+            className="w-full py-5 mt-10 text-base rounded-none"
+            variant="internalBtn"
+          >
+            Add Supervisor
+            <span className="hidden md:inline">& Send Credentials</span>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
