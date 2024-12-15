@@ -14,7 +14,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -36,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Link } from "react-router-dom";
 
 const mockSupervisors = [
   {
@@ -70,35 +70,36 @@ const mockSupervisors = [
   },
   {
     id: 6,
-    name: "John Doe",
-    email: "john@example.com",
+    name: "Eva Wilson",
+    email: "eva@example.com",
     designation: "Senior Supervisor",
   },
   {
     id: 7,
-    name: "Jane Smith",
-    email: "jane@example.com",
+    name: "Frank Miller",
+    email: "frank@example.com",
     designation: "Team Lead",
   },
   {
     id: 8,
-    name: "Bob Johnson",
-    email: "bob@example.com",
+    name: "Grace Lee",
+    email: "grace@example.com",
     designation: "Department Manager",
   },
   {
     id: 9,
-    name: "Alice Brown",
-    email: "alice@example.com",
+    name: "Henry Taylor",
+    email: "henry@example.com",
     designation: "Project Supervisor",
   },
   {
     id: 10,
-    name: "Charlie Davis",
-    email: "charlie@example.com",
+    name: "Ivy Chen",
+    email: "ivy@example.com",
     designation: "Assistant Manager",
   },
 ];
+
 function Supervisors() {
   const [supervisors, setSupervisors] = useState(mockSupervisors);
   const [search, setSearch] = useState("");
@@ -107,7 +108,6 @@ function Supervisors() {
   const [editingSupervisor, setEditingSupervisor] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  //filter supervisor
   const filteredSupervisors = supervisors.filter(
     (supervisor) =>
       supervisor.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -115,7 +115,6 @@ function Supervisors() {
       supervisor.designation.toLowerCase().includes(search.toLowerCase())
   );
 
-  //pagination code
   const lastItem = currentPage * supervisorPerPage;
   const firstItem = lastItem - supervisorPerPage;
   const totalPages = Math.ceil(filteredSupervisors.length / supervisorPerPage);
@@ -130,9 +129,11 @@ function Supervisors() {
     setEditingSupervisor({ ...supervisor });
     setIsEditDialogOpen(true);
   };
+
   const handleDelete = (id) => {
     setSupervisors(supervisors.filter((supervisor) => supervisor.id !== id));
   };
+
   const handleSaveEdit = () => {
     setSupervisors(
       supervisors.map((supervisor) =>
@@ -163,9 +164,10 @@ function Supervisors() {
     setSupervisorPerPage(Number(value));
     setCurrentPage(1);
   };
+
   return (
     <div className="p-1 lg:p-10 min-h-screen bg-gray-50">
-      <h1 className="text-3xl font-semibold md:text-4xl">Add Supervisor</h1>
+      <h1 className="text-3xl font-semibold md:text-4xl">All Supervisors</h1>
       <Separator />
       <div className="md:flex items-center justify-between gap-3 my-10">
         <Label className="md:hidden text-xl font-semibold" htmlFor="search">
@@ -178,9 +180,11 @@ function Supervisors() {
           onChange={handleSearch}
           className="max-w-sm w-full"
         />
-        <Button className="hidden md:flex" variant="internalBtn">
-          Add Supervisor
-        </Button>
+        <Link to="/admin/supervisor/add">
+          <Button className="hidden md:flex" variant="internalBtn">
+            Add Supervisor
+          </Button>
+        </Link>
       </div>
       <Table>
         <TableHeader>
@@ -203,83 +207,14 @@ function Supervisors() {
               <TableCell>{supervisor.designation}</TableCell>
               <TableCell>
                 <div className="flex items-center justify-center">
-                  <Dialog
-                    open={isEditDialogOpen}
-                    onOpenChange={setIsEditDialogOpen}
+                  <Button
+                    variant="secondary"
+                    className="bg-primary text-white"
+                    size="sm"
+                    onClick={() => handleEdit(supervisor)}
                   >
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        className="bg-primary text-white"
-                        size="sm"
-                        onClick={() => handleEdit(supervisor)}
-                      >
-                        <FaUserPen />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle className="text-3xl text-center">
-                          Edit Details
-                        </DialogTitle>
-                        <Separator />
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="name" className="text-right">
-                            Name
-                          </Label>
-                          <Input
-                            id="name"
-                            name="name"
-                            value={editingSupervisor?.name || ""}
-                            onChange={handleInputChange}
-                            className="col-span-3"
-                          />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="email" className="text-right">
-                            Email
-                          </Label>
-                          <Input
-                            id="email"
-                            name="email"
-                            value={editingSupervisor?.email || ""}
-                            onChange={handleInputChange}
-                            className="col-span-3"
-                          />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="designation" className="text-right">
-                            Designation
-                          </Label>
-                          <Input
-                            id="designation"
-                            name="designation"
-                            value={editingSupervisor?.designation || ""}
-                            onChange={handleInputChange}
-                            className="col-span-3"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex justify-between w-full space-x-2">
-                        <Button
-                          className="w-1/2"
-                          variant=""
-                          onClick={handleSaveEdit}
-                        >
-                          Save changes
-                        </Button>
-                        <Button
-                          className="w-1/2"
-                          variant="destructive"
-                          onClick={handleCancelEdit}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                    <FaUserPen />
+                  </Button>
                   <Button
                     variant="destructive"
                     size="sm"
@@ -319,13 +254,13 @@ function Supervisors() {
                 <PaginationPrevious
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="disabled:bg-gray-400"
+                  className="cursor-pointer disabled:opacity-50"
                 />
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink>{currentPage}</PaginationLink>
               </PaginationItem>
-              {totalPages > 2 && (
+              {totalPages > 2 && currentPage < totalPages - 1 && (
                 <PaginationItem>
                   <PaginationEllipsis />
                 </PaginationItem>
@@ -341,12 +276,73 @@ function Supervisors() {
                 <PaginationNext
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
+                  className="cursor-pointer disabled:opacity-50"
                 />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
         </div>
       </div>
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-3xl text-center">
+              Edit Details
+            </DialogTitle>
+            <Separator />
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={editingSupervisor?.name || ""}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="email" className="text-right">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                value={editingSupervisor?.email || ""}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="designation" className="text-right">
+                Designation
+              </Label>
+              <Input
+                id="designation"
+                name="designation"
+                value={editingSupervisor?.designation || ""}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <div className="flex justify-between w-full space-x-2">
+            <Button className="w-1/2" variant="" onClick={handleSaveEdit}>
+              Save changes
+            </Button>
+            <Button
+              className="w-1/2"
+              variant="destructive"
+              onClick={handleCancelEdit}
+            >
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

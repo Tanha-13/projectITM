@@ -34,26 +34,26 @@ function SideNav({ navItems }) {
             <SidebarMenu className="flex justify-center">
               {navItems.map((items) => (
                 <SidebarMenuItem className="mb-4" key={items.id}>
-                  <SidebarMenuButton>
-                    <Link to={`${items.url}`} className="flex items-center gap-4">
+                  <Link to={`${items.url}`} className="flex items-center gap-4">
+                    <SidebarMenuButton>
                       <items.icon className="text-primary md:text-xl" />
                       <span className="font-bold text-base">{items.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                    </SidebarMenuButton>
+                  </Link>
                   {/* <SidebarMenuBadge>24</SidebarMenuBadge> */}
                   {items.subItems?.length ? (
                     <SidebarMenuSub>
                       {items.subItems.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.id}>
-                          <SidebarMenuButton>
-                            <Link
-                              to={subItem.url}
-                              className="flex items-center gap-4"
-                            >
+                          <Link
+                            to={subItem.url}
+                            className="flex items-center gap-4"
+                          >
+                            <SidebarMenuButton>
                               <subItem.icon className="text-[#094074]" />
                               <span className="">{subItem.title}</span>
-                            </Link>
-                          </SidebarMenuButton>
+                            </SidebarMenuButton>
+                          </Link>
                         </SidebarMenuSubItem>
                       ))}
                     </SidebarMenuSub>

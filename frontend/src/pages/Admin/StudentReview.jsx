@@ -1,6 +1,10 @@
 function StudentReview() {
   return (
-    <div>StudentReview</div>
+    <div>
+        <div>
+            <h1>Registered Student Details</h1>
+        </div>
+    </div>
   )
 }
 

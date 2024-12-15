@@ -49,19 +49,19 @@ function AdminDashboard() {
     {
       id: 3,
       title: "Students",
-      url: "#",
+      url: "/admin/student/all",
       icon: FaUserFriends,
       subItems: [
         {
           id: 3.1,
           title: "Review",
-          url: "#",
+          url: "/admin/student/review",
           icon: FaUserPlus,
         },
         {
           id: 3.2,
           title: "View",
-          url: "#",
+          url: "/admin/student/all",
           icon: FaUsers,
         },
       ],
@@ -69,13 +69,13 @@ function AdminDashboard() {
     {
       id: 4,
       title: "Projects",
-      url: "#",
+      url: "/admin/projects",
       icon: FaProjectDiagram,
     },
     {
       id: 5,
       title: "Notifications",
-      url: "#",
+      url: "/admin/notifications",
       icon: FaBell,
     },
     {

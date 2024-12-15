@@ -1,9 +1,32 @@
 import { useState } from "react";
+import { Card, CardContent, CardHeader } from "../ui/card";
 
 function ProjectByType() {
   const [activeTab, setActiveTab] = useState("project");
 
   const tabs = ["project", "thesis"];
+
+  const bgColors = [
+    'bg-[#EB5B00]',
+    'bg-[#AB4459]',
+    'bg-[#8174A0]',
+    'bg-[#AE445A]',
+    'bg-[#3C552D]',
+    'bg-[#3B1C32]',
+    'bg-[#6A1E55]',
+    'bg-[#B03052]',
+    'bg-[#740938]',
+    'bg-[#9A7E6F]',
+    'bg-[#433878]',
+    'bg-[#3A6D8C]',
+    'bg-[#F05A7E]',
+    'bg-[#F0A8D0]',
+    'bg-[#E3A5C7]',
+    'bg-[#131842]',
+    'bg-[#FF4191]',
+    'bg-[#E0A75E]',
+  ];
+  const randomColor = () => bgColors[Math.floor(Math.random()* bgColors.length)];
 
   const projectCards = [
     { title: "Project 1", description: "Description of Project 1" },
@@ -12,7 +35,7 @@ function ProjectByType() {
   ];
 
   const thesisCards = [
-    { title: "Thesis 1", description: "Description of Thesis 1" },
+    {  title: "Thesis 1", description: "Description of Thesis 1" },
     { title: "Thesis 2", description: "Description of Thesis 2" },
     { title: "Thesis 3", description: "Description of Thesis 3" },
   ];
@@ -38,10 +61,14 @@ function ProjectByType() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {(activeTab === "project" ? projectCards : thesisCards).map(
             (card, index) => (
-              <div key={index} className="bg-gray-100 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-2">{card.title}</h3>
-                <p className="text-gray-600">{card.description}</p>
-              </div>
+              <Card className="overflow-hidden border-0" key={index}>
+                <div className={`h-48 bg-[#EB5B40] transition-colors duration-300 hover:brightness-110`} />
+                <CardContent className="bg-gray-200">
+                  <p>{card.title}</p>
+                  <p>{card.description}</p>
+                </CardContent>
+              </Card>
+
             )
           )}
         </div>

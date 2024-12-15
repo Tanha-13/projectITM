@@ -33,13 +33,13 @@ function SupervisorDashboard() {
         {
           id: 2.1,
           title: "Create",
-          url: "#",
+          url: "/supervisor/create-project",
           icon: FaMinus,
         },
         {
           id: 2.2,
           title: "All",
-          url: "#",
+          url: "/supervisor/projects",
           icon: FaMinus,
         },
       ],
