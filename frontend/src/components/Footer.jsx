@@ -5,7 +5,7 @@ import { FaGlobe } from "react-icons/fa";
 
 function Footer() {
   return (
-    <div className="p-4 md:p-14 bg-gray-100 mt-10">
+    <div className="p-4 md:p-14 ">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className=" flex-1">

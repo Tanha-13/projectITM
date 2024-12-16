@@ -22,26 +22,26 @@ function AdminDashboard() {
     {
       id:1,
       title:"Overview",
-      url:"/admin",
+      url:"",
       icon:FaHome
 
     },
     {
       id: 2,
       title: "Supervisors",
-      url: "/admin/supervisor/all",
+      url: "supervisor/all",
       icon: FaUsersCog,
       subItems: [
         {
           id: 2.1,
           title: "Add",
-          url: "/admin/supervisor/add",
+          url: "supervisor/add",
           icon: FaUserPlus,
         },
         {
           id: 2.2,
           title: "View",
-          url: "/admin/supervisor/all",
+          url: "supervisor/all",
           icon: FaUsers,
         },
       ],
@@ -49,19 +49,19 @@ function AdminDashboard() {
     {
       id: 3,
       title: "Students",
-      url: "/admin/student/all",
+      url: "student/all",
       icon: FaUserFriends,
       subItems: [
         {
           id: 3.1,
           title: "Review",
-          url: "/admin/student/review",
+          url: "student/review",
           icon: FaUserPlus,
         },
         {
           id: 3.2,
           title: "View",
-          url: "/admin/student/all",
+          url: "student/all",
           icon: FaUsers,
         },
       ],
@@ -69,13 +69,13 @@ function AdminDashboard() {
     {
       id: 4,
       title: "Projects",
-      url: "/admin/projects",
+      url: "projects",
       icon: FaProjectDiagram,
     },
     {
       id: 5,
       title: "Notifications",
-      url: "/admin/notifications",
+      url: "notifications",
       icon: FaBell,
     },
     {

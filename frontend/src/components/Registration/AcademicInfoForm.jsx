@@ -1,96 +1,70 @@
-import React from 'react';
 
-export default function AcademicInfoForm({ formData, handleChange }) {
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import PropTypes from "prop-types"
+
+export default function AcademicInfoForm({ formData, handleChange, errors }) {
   return (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Have you registered for thesis/project?
-        </label>
-        <div className="mt-2 space-y-2">
-          <div className="flex items-center">
-            <input
-              id="thesis-yes"
-              name="registeredForThesis"
-              type="radio"
-              value="yes"
-              checked={formData.registeredForThesis === 'yes'}
-              onChange={(e) => handleChange('registeredForThesis', e.target.value)}
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
-            />
-            <label htmlFor="thesis-yes" className="ml-3 block text-sm font-medium text-gray-700">
-              Yes
-            </label>
-          </div>
-          <div className="flex items-center">
-            <input
-              id="thesis-no"
-              name="registeredForThesis"
-              type="radio"
-              value="no"
-              checked={formData.registeredForThesis === 'no'}
-              onChange={(e) => handleChange('registeredForThesis', e.target.value)}
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
-            />
-            <label htmlFor="thesis-no" className="ml-3 block text-sm font-medium text-gray-700">
-              No
-            </label>
-          </div>
-        </div>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Is your proposal accepted?
-        </label>
-        <div className="mt-2 space-y-2">
-          <div className="flex items-center">
-            <input
-              id="proposal-yes"
-              name="proposalAccepted"
-              type="radio"
-              value="yes"
-              checked={formData.proposalAccepted === 'yes'}
-              onChange={(e) => handleChange('proposalAccepted', e.target.value)}
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
-            />
-            <label htmlFor="proposal-yes" className="ml-3 block text-sm font-medium text-gray-700">
-              Yes
-            </label>
-          </div>
-          <div className="flex items-center">
-            <input
-              id="proposal-no"
-              name="proposalAccepted"
-              type="radio"
-              value="no"
-              checked={formData.proposalAccepted === 'no'}
-              onChange={(e) => handleChange('proposalAccepted', e.target.value)}
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
-            />
-            <label htmlFor="proposal-no" className="ml-3 block text-sm font-medium text-gray-700">
-              No
-            </label>
-          </div>
-        </div>
-      </div>
-      <div>
-        <label htmlFor="supervisor" className="block text-sm font-medium text-gray-700">
-          Supervisor
-        </label>
-        <select
-          id="supervisor"
-          name="supervisor"
-          required
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          value={formData.supervisor}
-          onChange={(e) => handleChange('supervisor', e.target.value)}
+        <Label className="text-base">Have you registered for thesis/project?</Label>
+        <RadioGroup
+          value={formData.registeredForProject}
+          onValueChange={(value) => handleChange('registeredForProject', value)}
+          className={`mt-2 ${errors.registeredForProject ? 'text-red-600' : ''}`}
         >
-          <option value="">Select supervisor</option>
-          <option value="dr-smith">Dr. Smith</option>
-          <option value="prof-johnson">Prof. Johnson</option>
-          <option value="dr-williams">Dr. Williams</option>
-        </select>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="yes" id="thesis-yes" />
+            <Label htmlFor="thesis-yes">Yes</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="no" id="thesis-no" />
+            <Label htmlFor="thesis-no">No</Label>
+          </div>
+        </RadioGroup>
+        {errors.registeredForProject && <p className="text-red-600 text-sm mt-1">{errors.registeredForProject}</p>}
+      </div>
+      <div>
+        <Label className="text-base">Is your proposal accepted?</Label>
+        <RadioGroup
+          value={formData.proposalAccepted}
+          onValueChange={(value) => handleChange('proposalAccepted', value)}
+          className={`mt-2 ${errors.registeredForProject ? 'text-red-600' : ''}`}
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="yes" id="proposal-yes" />
+            <Label htmlFor="proposal-yes">Yes</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="no" id="proposal-no" />
+            <Label htmlFor="proposal-no">No</Label>
+          </div>
+        </RadioGroup>
+        {errors.proposalAccepted && <p className="text-red-600 text-sm mt-1">{errors.proposalAccepted}</p>}
+      </div>
+      <div>
+        <Label htmlFor="supervisor">Supervisor</Label>
+        <Select
+          value={formData.supervisor}
+          onValueChange={(value) => handleChange('supervisor',value)}
+        >
+          <SelectTrigger className={`mt-2 ${errors.registeredForProject ? 'border-red-600' : ''}`}>
+            <SelectValue placeholder="Select supervisor" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="dr-smith">Dr. Smith</SelectItem>
+            <SelectItem value="prof-johnson">Prof. Johnson</SelectItem>
+            <SelectItem value="dr-williams">Dr. Williams</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.supervisor && <p className="text-red-600 text-sm mt-1">{errors.supervisor}</p>}
       </div>
     </div>
   );
+}
+AcademicInfoForm.propTypes = {
+  formData : PropTypes.object,
+  handleChange: PropTypes.func,
+  errors : PropTypes.object
 }

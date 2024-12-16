@@ -1,6 +1,10 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import PropTypes from "prop-types"
 
-export default function PersonalInfoForm({ formData, handleChange }) {
+export default function PersonalInfoForm({ formData, handleChange, errors }) {
   const currentYear = new Date().getFullYear();
   const startYear = 2020;
   
@@ -18,13 +22,13 @@ export default function PersonalInfoForm({ formData, handleChange }) {
     let batchCount = 1;
     for (let year = startYear; year <= currentYear + 1; year++) {
       options.push({ 
-        value: `Spring ${year} Batch ${batchCount.toString().padStart(2, '0')}`, 
-        label: `Spring ${year} Batch ${batchCount.toString().padStart(2, '0')}` 
+        value: `Batch ${batchCount.toString().padStart(2, '0')}`, 
+        label: `Batch ${batchCount.toString().padStart(2, '0')}` 
       });
       batchCount++;
       options.push({ 
-        value: `Fall ${year} Batch ${batchCount.toString().padStart(2, '0')}`, 
-        label: `Fall ${year} Batch ${batchCount.toString().padStart(2, '0')}` 
+        value: `Batch ${batchCount.toString().padStart(2, '0')}`, 
+        label: `Batch ${batchCount.toString().padStart(2, '0')}` 
       });
       batchCount++;
     }
@@ -33,126 +37,116 @@ export default function PersonalInfoForm({ formData, handleChange }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-            First Name
-          </label>
-          <input
+          <Label htmlFor="firstName">First Name</Label>
+          <Input
             id="firstName"
             name="firstName"
-            type="text"
-            required
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             value={formData.firstName}
             onChange={(e) => handleChange('firstName', e.target.value)}
+            className={`mt-1 ${errors.firstName ? 'border-red-600' : ''}`}
           />
+          {errors.firstName && <p className="text-red-600 text-sm mt-1">{errors.firstName}</p>}
         </div>
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-            Last Name
-          </label>
-          <input
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input
             id="lastName"
             name="lastName"
-            type="text"
-            required
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             value={formData.lastName}
             onChange={(e) => handleChange('lastName', e.target.value)}
+            className={`mt-1 ${errors.lastName ? 'border-red-600' : ''}`}
           />
+          {errors.lastName && <p className="text-red-600 text-sm mt-1">{errors.lastName}</p>}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
+          <Label htmlFor="email">Email</Label>
+          <Input
             id="email"
             name="email"
-            type="email"
-            required
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            value={formData.email}
+            type="email"            value={formData.email}
             onChange={(e) => handleChange('email', e.target.value)}
+            className={`mt-1 ${errors.email ? 'border-red-600' : ''}`}
           />
+          {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
         </div>
         <div>
-          <label htmlFor="id" className="block text-sm font-medium text-gray-700">
-            ID
-          </label>
-          <input
-            id="id"
-            name="id"
-            type="text"
-            required
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            value={formData.id}
-            onChange={(e) => handleChange('id', e.target.value)}
+          <Label htmlFor="studentId">ID</Label>
+          <Input
+            id="studentId"
+            name="studentId"
+            value={formData.studentId}
+            onChange={(e) => handleChange('studentId', e.target.value)}
+            className={`mt-1 ${errors.studentId ? 'border-red-600' : ''}`}
           />
+          {errors.studentId && <p className="text-red-600 text-sm mt-1">{errors.studentId}</p>}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
-            Gender
-          </label>
-          <select
-            id="gender"
-            name="gender"
-            required
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          <Label htmlFor="gender">Gender</Label>
+          <Select
             value={formData.gender}
-            onChange={(e) => handleChange('gender', e.target.value)}
+            onValueChange={(value) => handleChange('gender', value)}
           >
-            <option value="">Select gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
+            <SelectTrigger className={`mt-1 ${errors.gender ? 'border-red-600' : ''}`}>
+              <SelectValue placeholder="Select gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.gender && <p className="text-red-600 text-sm mt-1">{errors.gender}</p>}
         </div>
         <div>
-          <label htmlFor="semester" className="block text-sm font-medium text-gray-700">
-            Semester
-          </label>
-          <select
-            id="semester"
-            name="semester"
-            required
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          <Label htmlFor="semester">Semester</Label>
+          <Select
             value={formData.semester}
-            onChange={(e) => handleChange('semester', e.target.value)}
+            onValueChange={(value) => handleChange('semester', value)}
           >
-            <option value="">Select semester</option>
-            {semesterOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className={`mt-1 ${errors.semester ? 'border-red-600' : ''}`}>
+              <SelectValue placeholder="Select semester" />
+            </SelectTrigger>
+            <SelectContent>
+              {semesterOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.semester && <p className="text-red-600 text-sm mt-1">{errors.semester}</p>}
         </div>
       </div>
       <div>
-        <label htmlFor="batch" className="block text-sm font-medium text-gray-700">
-          Batch
-        </label>
-        <select
-          id="batch"
-          name="batch"
-          required
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        <Label htmlFor="batch">Batch</Label>
+        <Select
           value={formData.batch}
-          onChange={(e) => handleChange('batch', e.target.value)}
+          onValueChange={(value) => handleChange('batch', value)}
         >
-          <option value="">Select batch</option>
-          {batchOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className={`mt-1 ${errors.batch ? 'border-red-600' : ''}`}>
+            <SelectValue placeholder="Select batch" />
+          </SelectTrigger>
+          <SelectContent>
+            {batchOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors.batch && <p className="text-red-600 text-sm mt-1">{errors.batch}</p>}
       </div>
     </div>
   );
+}
+PersonalInfoForm.propTypes = {
+  formData : PropTypes.object,
+  handleChange: PropTypes.func,
+  errors : PropTypes.object
 }

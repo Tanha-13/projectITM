@@ -14,6 +14,7 @@ import SupervisorDashboard from "@/pages/Dashboard/SupervisorDashboard";
 import Home from "@/pages/Home/Home";
 import ForgetPassword from "@/pages/Login/ForgetPassword";
 import Login from "@/pages/Login/Login";
+import ResetPassword from "@/pages/Login/ResetPassword";
 import ProjectDetails from "@/pages/Project/ProjectDetails";
 import Projects from "@/pages/Project/Projects";
 import Register from "@/pages/Register/Register";
@@ -38,41 +39,45 @@ const router = createBrowserRouter([
           element: <ForgetPassword />,
         },
         {
+          path: "/reset-password",
+          element: <ResetPassword/>,
+        },
+        {
           path: "/register",
           element: <Register />,
         },
       ],
     },
     {
-        path:"/admin",
+        path:"/admin/:userId",
         element:<AdminDashboard/>,
         children:[
               {
-                path: "/admin",
+                path: "",
                 element: <AdminContent/>,
               },
                   {
-                    path:"/admin/supervisor/add",
+                    path:"supervisor/add",
                     element:<AddSupervisor/>
                   },
                   {
-                    path:"/admin/supervisor/all",
+                    path:"supervisor/all",
                     element:<Supervisors/>
                   },
                   {
-                    path:"/admin/student/review",
+                    path:"student/review",
                     element:<StudentReview/>
                   },
                   {
-                    path:"/admin/student/all",
+                    path:"student/all",
                     element:<StudentsAdmin/>
                   },
                   {
-                    path:"/admin/projects",
+                    path:"projects",
                     element:<Projects/>
                   },
                   {
-                    path:"/admin/notifications",
+                    path:"notifications",
                     element:<AdminNotifications/>
                   },
                 ]
