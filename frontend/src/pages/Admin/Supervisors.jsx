@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,91 +36,105 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
-const mockSupervisors = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    designation: "Senior Supervisor",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    designation: "Team Lead",
-  },
-  {
-    id: 3,
-    name: "Bob Johnson",
-    email: "bob@example.com",
-    designation: "Department Manager",
-  },
-  {
-    id: 4,
-    name: "Alice Brown",
-    email: "alice@example.com",
-    designation: "Project Supervisor",
-  },
-  {
-    id: 5,
-    name: "Charlie Davis",
-    email: "charlie@example.com",
-    designation: "Assistant Manager",
-  },
-  {
-    id: 6,
-    name: "Eva Wilson",
-    email: "eva@example.com",
-    designation: "Senior Supervisor",
-  },
-  {
-    id: 7,
-    name: "Frank Miller",
-    email: "frank@example.com",
-    designation: "Team Lead",
-  },
-  {
-    id: 8,
-    name: "Grace Lee",
-    email: "grace@example.com",
-    designation: "Department Manager",
-  },
-  {
-    id: 9,
-    name: "Henry Taylor",
-    email: "henry@example.com",
-    designation: "Project Supervisor",
-  },
-  {
-    id: 10,
-    name: "Ivy Chen",
-    email: "ivy@example.com",
-    designation: "Assistant Manager",
-  },
-];
+// const mockSupervisors = [
+//   {
+//     id: 1,
+//     name: "John Doe",
+//     email: "john@example.com",
+//     designation: "Senior Supervisor",
+//   },
+//   {
+//     id: 2,
+//     name: "Jane Smith",
+//     email: "jane@example.com",
+//     designation: "Team Lead",
+//   },
+//   {
+//     id: 3,
+//     name: "Bob Johnson",
+//     email: "bob@example.com",
+//     designation: "Department Manager",
+//   },
+//   {
+//     id: 4,
+//     name: "Alice Brown",
+//     email: "alice@example.com",
+//     designation: "Project Supervisor",
+//   },
+//   {
+//     id: 5,
+//     name: "Charlie Davis",
+//     email: "charlie@example.com",
+//     designation: "Assistant Manager",
+//   },
+//   {
+//     id: 6,
+//     name: "Eva Wilson",
+//     email: "eva@example.com",
+//     designation: "Senior Supervisor",
+//   },
+//   {
+//     id: 7,
+//     name: "Frank Miller",
+//     email: "frank@example.com",
+//     designation: "Team Lead",
+//   },
+//   {
+//     id: 8,
+//     name: "Grace Lee",
+//     email: "grace@example.com",
+//     designation: "Department Manager",
+//   },
+//   {
+//     id: 9,
+//     name: "Henry Taylor",
+//     email: "henry@example.com",
+//     designation: "Project Supervisor",
+//   },
+//   {
+//     id: 10,
+//     name: "Ivy Chen",
+//     email: "ivy@example.com",
+//     designation: "Assistant Manager",
+//   },
+// ];
 
 function Supervisors() {
-  const [supervisors, setSupervisors] = useState(mockSupervisors);
+  const [supervisors, setSupervisors] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [supervisorPerPage, setSupervisorPerPage] = useState(5);
   const [editingSupervisor, setEditingSupervisor] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  console.log(editingSupervisor);
 
+  useEffect(() => {
+    fetchSupervisors();
+  }, []);
 
   const fetchSupervisors = async () => {
-    try{
-      // const response = await fetch("")
-    }catch(err){
-      console.log(err);
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/admin/supervisors"
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch supervisors");
+      }
+      const data = await response.json();
+      console.log(data);
+      setSupervisors(data);
+    } catch (error) {
+      console.error("Error fetching supervisors:", error);
     }
-  }
+  };
 
   const filteredSupervisors = supervisors.filter(
     (supervisor) =>
-      supervisor.name.toLowerCase().includes(search.toLowerCase()) ||
-      supervisor.email.toLowerCase().includes(search.toLowerCase()) ||
+      supervisor.user.firstName.toLowerCase().includes(search.toLowerCase()) ||
+      supervisor.user.lastName.toLowerCase().includes(search.toLowerCase()) ||
+      supervisor.user.email.toLowerCase().includes(search.toLowerCase()) ||
       supervisor.designation.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -128,6 +142,7 @@ function Supervisors() {
   const firstItem = lastItem - supervisorPerPage;
   const totalPages = Math.ceil(filteredSupervisors.length / supervisorPerPage);
   const currentSupervisors = filteredSupervisors.slice(firstItem, lastItem);
+  console.log(currentSupervisors);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
@@ -139,18 +154,67 @@ function Supervisors() {
     setIsEditDialogOpen(true);
   };
 
-  const handleDelete = (id) => {
-    setSupervisors(supervisors.filter((supervisor) => supervisor.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      Swal.fire({
+        title: "Are you sure about deleting?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const response = await fetch(
+            `http://localhost:3000/api/admin/supervisor/${id}`,
+            {
+              method: "DELETE",
+            }
+          );
+          if (!response.ok) {
+            throw new Error("Failed to delete supervisor");
+          }
+          fetchSupervisors();
+          Swal.fire({
+            title: "Deleted!",
+            text: "Supervisor details has been deleted",
+            icon: "success",
+          });
+        }
+      });
+    } catch (error) {
+      console.error("Error deleting supervisor:", error);
+    }
   };
 
-  const handleSaveEdit = () => {
-    setSupervisors(
-      supervisors.map((supervisor) =>
-        supervisor.id === editingSupervisor.id ? editingSupervisor : supervisor
-      )
-    );
-    setEditingSupervisor(null);
-    setIsEditDialogOpen(false);
+  const handleSaveEdit = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/admin/supervisor/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editingSupervisor),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update supervisor");
+      }
+      fetchSupervisors();
+      setEditingSupervisor(null);
+      setIsEditDialogOpen(false);
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Supervisor details has been updated",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (error) {
+      console.error("Error updating supervisor:", error);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -160,7 +224,13 @@ function Supervisors() {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setEditingSupervisor({ ...editingSupervisor, [name]: value });
+    setEditingSupervisor((prev) => ({
+      ...prev,
+      user: {
+        ...prev.user,
+        [name]: value,
+      },
+    }));
   };
 
   const handlePageChange = (newPage) => {
@@ -207,12 +277,12 @@ function Supervisors() {
         </TableHeader>
         <TableBody>
           {currentSupervisors.map((supervisor, index) => (
-            <TableRow key={supervisor.id}>
+            <TableRow key={supervisor.user._id}>
               <TableCell>
                 {(currentPage - 1) * supervisorPerPage + index + 1}
               </TableCell>
-              <TableCell>{supervisor.name}</TableCell>
-              <TableCell>{supervisor.email}</TableCell>
+              <TableCell>{`${supervisor.user.firstName} ${supervisor.user.lastName}`}</TableCell>
+              <TableCell>{supervisor.user.email}</TableCell>
               <TableCell>{supervisor.designation}</TableCell>
               <TableCell>
                 <div className="flex items-center justify-center">
@@ -228,7 +298,7 @@ function Supervisors() {
                     variant="destructive"
                     size="sm"
                     className="ml-2"
-                    onClick={() => handleDelete(supervisor.id)}
+                    onClick={() => handleDelete(supervisor._id)}
                   >
                     <FaTrash />
                   </Button>
@@ -302,13 +372,25 @@ function Supervisors() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
+              <Label htmlFor="firstName" className="text-right">
+                First Name
               </Label>
               <Input
-                id="name"
-                name="name"
-                value={editingSupervisor?.name || ""}
+                id="firstName"
+                name="firstName"
+                value={editingSupervisor?.user?.firstName || ""}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="lastName" className="text-right">
+                Last Name
+              </Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                value={editingSupervisor?.user?.lastName || ""}
                 onChange={handleInputChange}
                 className="col-span-3"
               />
@@ -320,7 +402,7 @@ function Supervisors() {
               <Input
                 id="email"
                 name="email"
-                value={editingSupervisor?.email || ""}
+                value={editingSupervisor?.user?.email || ""}
                 onChange={handleInputChange}
                 className="col-span-3"
               />
@@ -339,7 +421,11 @@ function Supervisors() {
             </div>
           </div>
           <div className="flex justify-between w-full space-x-2">
-            <Button className="w-1/2" variant="" onClick={handleSaveEdit}>
+            <Button
+              className="w-1/2"
+              variant=""
+              onClick={() => handleSaveEdit(editingSupervisor._id)}
+            >
               Save changes
             </Button>
             <Button

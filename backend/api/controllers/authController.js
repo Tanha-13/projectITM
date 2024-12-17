@@ -1,4 +1,4 @@
-const { getUserModel, connectToUserDB } = require("../config/userDB");
+const { getUserModel, connectToUserDB, getSupervisorModel } = require("../config/userDB");
 const User = require("../models/userModel");
 const errorHandler = require("../utils/errors");
 const bcrypt = require("bcryptjs");
@@ -16,6 +16,7 @@ const login = async (req, res, next) => {
   try {
 
     const { email, password } = req.body;
+    console.log(email,password);
     await connectToUserDB();
     const User = getUserModel();
     

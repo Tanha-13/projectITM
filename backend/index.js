@@ -46,6 +46,12 @@ databaseConnection().then(() => {
   // admin routing
   const adminRoutes = require("./api/routes/adminRoute");
   app.use("/api/admin",adminRoutes);
+  //supervisor routing
+  const supervisorRoutes = require("./api/routes/supervisor");
+  app.use("/api/supervisor",supervisorRoutes);
+  //student routing
+  const studentRoutes = require("./api/routes/student");
+  app.use("/api/supervisor",studentRoutes);
   // server
   const port = process.env.PORT || 5000;
   app.listen(port, () => {

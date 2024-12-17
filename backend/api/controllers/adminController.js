@@ -1,6 +1,7 @@
 const { getUserModel, getSupervisorModel, connectToUserDB } = require("../config/userDB");
 const nodemailer = require('nodemailer');
 const bcrypt = require("bcryptjs");
+const errorHandler = require("../utils/errors");
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -74,7 +75,7 @@ const allSupervisors = async (req, res, next) => {
     res.status(200).json(supervisors);
   } catch (error) {
     console.error("Error in allSupervisors:", error);
-    res.status(500).json({ message: 'Error fetching supervisors', error: error.message });
+    next(errorHandler(400,"Failed to load all supervisors data"));
   }
 };
 
@@ -85,18 +86,19 @@ const updateSupervisor = async (req, res, next) => {
     const Supervisor = getSupervisorModel();
     const { id } = req.params;
     const updateData = req.body;
+    console.log(updateData);
     
     const supervisor = await Supervisor.findById(id);
+    console.log(supervisor);
     if (!supervisor) {
       return res.status(404).json({ message: 'Supervisor not found' });
     }
 
     // Update user data
     await User.findByIdAndUpdate(supervisor.user, {
-      firstName: updateData.firstName,
-      lastName: updateData.lastName,
-      email: updateData.email,
-      gender: updateData.gender,
+      firstName: updateData.user.firstName,
+      lastName: updateData.user.lastName,
+      email: updateData.user.email,
     });
 
     // Update supervisor data
