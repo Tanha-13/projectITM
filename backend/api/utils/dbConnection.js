@@ -35,22 +35,21 @@ const connectToDatabase = async ({ uri, dbName }) => {
   }
 };
 
-const disconnectFromDatabase = async (dbName) => {
-  if (!connections[dbName]) {
-    console.log(`No active ${dbName} database`);
-    return;
-  }
-  try {
-    await connections[dbName].close();
-    delete connections[dbName];
-    console.log(`Disconnected from ${dbName} database`);
-  } catch (err) {
-    console.log(`${err}`);
-    throw err;
-  }
-};
+// const disconnectFromDatabase = async (dbName) => {
+//   if (!connections[dbName]) {
+//     console.log(`No active ${dbName} database`);
+//     return;
+//   }
+//   try {
+//     await connections[dbName].close();
+//     delete connections[dbName];
+//     console.log(`Disconnected from ${dbName} database`);
+//   } catch (err) {
+//     console.log(`${err}`);
+//     throw err;
+//   }
+// };
 
 module.exports = {
   connectToDatabase,
-  disconnectFromDatabase,
 };

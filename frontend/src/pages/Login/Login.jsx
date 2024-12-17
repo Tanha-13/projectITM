@@ -56,11 +56,14 @@ export default function Login() {
           throw new Error('Server responded with an error');
         }
         const data = await res.json();
-        console.log(data);
+        console.log(data.role);
         localStorage.setItem("token", data.token);
         localStorage.setItem("userId", data._id);
         if(data.role === 'admin'){
         navigate(`/admin/${data._id}`);
+        }
+        else if(data.role === 'supervisor'){
+          navigate(`/supervisor/${data._id}`);
         }
         
         // if (data.isFirstLogin && data.role === "supervisor") {

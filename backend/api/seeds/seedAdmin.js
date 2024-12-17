@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require("dotenv").config();
-const {connectToUserDB, disconnectFromUserDB, getUserModel} = require("../config/userDB");
+const {connectToUserDB, getUserModel} = require("../config/userDB");
 
 const seedAdmin = async() => {
     await connectToUserDB();
@@ -25,8 +25,6 @@ const seedAdmin = async() => {
         console.log("Admin user created successfully");
     }catch(error){
         console.log(`${error}`);
-    }finally{
-        await disconnectFromUserDB();
     }
 }
 

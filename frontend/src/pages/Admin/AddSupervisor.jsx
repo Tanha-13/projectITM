@@ -12,8 +12,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { generateTemporaryPassword } from "@/lib/generatePassword";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
-function AddSupervisor() {
+export default function AddSupervisor() {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -23,6 +25,7 @@ function AddSupervisor() {
     tempPassword: "",
   });
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,9 +33,9 @@ function AddSupervisor() {
       ...prev,
       [name]: value,
     }));
-    setErrors(prevErrors => ({
+    setErrors((prevErrors) => ({
       ...prevErrors,
-      [name]: ''
+      [name]: "",
     }));
   };
 
@@ -41,9 +44,9 @@ function AddSupervisor() {
       ...prev,
       gender: value,
     }));
-    setErrors(prevErrors => ({
+    setErrors((prevErrors) => ({
       ...prevErrors,
-      gender: ''
+      gender: "",
     }));
   };
 
@@ -53,9 +56,9 @@ function AddSupervisor() {
       ...prev,
       tempPassword: newPassword,
     }));
-    setErrors(prevErrors => ({
+    setErrors((prevErrors) => ({
       ...prevErrors,
-      tempPassword: ''
+      tempPassword: "",
     }));
   };
 
@@ -64,7 +67,7 @@ function AddSupervisor() {
     Object.keys(formData).forEach((key) => {
       if (!formData[key]) {
         newErrors[key] = `${
-          key.charAt(0).toUpperCase()+key.slice(1)
+          key.charAt(0).toUpperCase() + key.slice(1)
         } is required`;
       }
     });
@@ -72,87 +75,134 @@ function AddSupervisor() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log("Form submitted:", formData);
-      // send data to backend
+      Swal.fire({
+        title: "Do you want to create a supervisor account?",
+        icon: "question",
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: "Add",
+        denyButtonText: "Don't add",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(
+              "http://localhost:3000/api/admin/add-supervisor",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+              }
+            );
+            const data = await response.json();
+            console.log(data);
+            if (!response.ok) {
+              throw new Error("Failed to add supervisor");
+            }
+            Swal.fire(
+              "Added!",
+              "The supervisor account has been created.",
+              "success"
+            );
+            setFormData({
+              firstName: "",
+              lastName: "",
+              email: "",
+              designation: "",
+              gender: "",
+              tempPassword: "",
+            });
+          } catch (error) {
+            console.log("error", error);
+            setErrors({
+              submit:
+                error.message || "Failed to add supervisor. Please try again.",
+            });
+            Swal.fire(
+              "Error!",
+              "There was an issue creating the account.",
+              "error"
+            );
+          }
+        } else if (result.isDenied) {
+          Swal.fire("Changes are not added", "", "info");
+        }
+      });
     }
   };
-  /**
-   * 
-   */
 
   return (
     <div className="p-2 md:p-10 min-h-screen bg-gray-50">
       <Card className="p-5 max-w-7xl mx-auto w-full">
         <CardHeader>
-        <h1 className="text-3xl font-semibold md:text-4xl">Add Supervisor</h1>
-        <Separator />
+          <h1 className="text-3xl font-semibold md:text-4xl">Add Supervisor</h1>
+          <Separator />
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  placeholder="enter first name"
-                  className={`${errors.firstName ? "border-red-600" : ""}`}
-                />
-                {errors.firstName && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {errors.firstName}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  placeholder="enter last name"
-                  className={`${errors.lastName ? "border-red-600" : ""}`}
-                />
-                {errors.lastName && (
-                  <p className="text-red-600 text-sm mt-1">{errors.lastName}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="enter email"
-                  className={`${errors.email ? "border-red-600" : ""}`}
-                />
-                {errors.email && (
-                  <p className="text-red-600 text-sm mt-1">{errors.email}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="designation">Designation</Label>
-                <Input
-                  id="designation"
-                  name="designation"
-                  value={formData.designation}
-                  onChange={handleInputChange}
-                  placeholder="enter designation"
-                  className={`${errors.designation ? "border-red-500" : ""}`}
-                />
-                {errors.designation && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {errors.designation}
-                  </p>
-                )}
-              </div>
+            <div>
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                placeholder="enter first name"
+                className={`${errors.firstName ? "border-red-600" : ""}`}
+              />
+              {errors.firstName && (
+                <p className="text-red-600 text-sm mt-1">{errors.firstName}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                placeholder="enter last name"
+                className={`${errors.lastName ? "border-red-600" : ""}`}
+              />
+              {errors.lastName && (
+                <p className="text-red-600 text-sm mt-1">{errors.lastName}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="enter email"
+                className={`${errors.email ? "border-red-600" : ""}`}
+              />
+              {errors.email && (
+                <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="designation">Designation</Label>
+              <Input
+                id="designation"
+                name="designation"
+                value={formData.designation}
+                onChange={handleInputChange}
+                placeholder="enter designation"
+                className={`${errors.designation ? "border-red-500" : ""}`}
+              />
+              {errors.designation && (
+                <p className="text-red-600 text-sm mt-1">
+                  {errors.designation}
+                </p>
+              )}
+            </div>
 
             <div>
               <Label htmlFor="gender">Gender</Label>
@@ -208,5 +258,3 @@ function AddSupervisor() {
     </div>
   );
 }
-
-export default AddSupervisor;

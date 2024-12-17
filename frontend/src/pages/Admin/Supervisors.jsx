@@ -108,6 +108,15 @@ function Supervisors() {
   const [editingSupervisor, setEditingSupervisor] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
+
+  const fetchSupervisors = async () => {
+    try{
+      // const response = await fetch("")
+    }catch(err){
+      console.log(err);
+    }
+  }
+
   const filteredSupervisors = supervisors.filter(
     (supervisor) =>
       supervisor.name.toLowerCase().includes(search.toLowerCase()) ||

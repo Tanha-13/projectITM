@@ -21,25 +21,25 @@ function SupervisorDashboard() {
     {
       id: 1,
       title: "Home",
-      url: "/supervisor",
+      url: "",
       icon: FaHome,
     },
     {
       id: 2,
       title: "Projects",
-      url: "/supervisor/projects",
+      url: "projects",
       icon: FaProjectDiagram,
       subItems: [
         {
           id: 2.1,
           title: "Create",
-          url: "/supervisor/create-project",
+          url: "create-project",
           icon: FaMinus,
         },
         {
           id: 2.2,
           title: "All",
-          url: "/supervisor/projects",
+          url: "projects",
           icon: FaMinus,
         },
       ],

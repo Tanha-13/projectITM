@@ -84,19 +84,19 @@ const router = createBrowserRouter([
               
     },
     {
-        path:"/supervisor",
+        path:"/supervisor/:userId",
         element:<SupervisorDashboard/>,
         children:[
             {
-                path:'/supervisor',
+                path:'',
                 element:<SupervisorContent/>
             },
             {
-                path:"/supervisor/projects",
+                path:"projects",
                 element:<Projects/>
             },
             {
-              path:"/supervisor/create-project",
+              path:"create-project",
               element:<CreateProject/>
             }
         ]
