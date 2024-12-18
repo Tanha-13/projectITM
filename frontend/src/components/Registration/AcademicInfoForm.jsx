@@ -4,7 +4,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import PropTypes from "prop-types"
 
-export default function AcademicInfoForm({ formData, handleChange, errors }) {
+export default function AcademicInfoForm({ formData, handleChange, errors,supervisors }) {
   return (
     <div className="space-y-6">
       <div>
@@ -53,9 +53,10 @@ export default function AcademicInfoForm({ formData, handleChange, errors }) {
             <SelectValue placeholder="Select supervisor" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="dr-smith">Dr. Smith</SelectItem>
-            <SelectItem value="prof-johnson">Prof. Johnson</SelectItem>
-            <SelectItem value="dr-williams">Dr. Williams</SelectItem>
+            {/* <SelectItem value="dr-smith">Dr. Smith</SelectItem> */}
+            {supervisors.map((supervisor) =>(
+              <SelectItem key={supervisor._id} value={`${supervisor._id}`}>{`${supervisor.user.firstName} ${supervisor.user.lastName}`}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         {errors.supervisor && <p className="text-red-600 text-sm mt-1">{errors.supervisor}</p>}
@@ -66,5 +67,6 @@ export default function AcademicInfoForm({ formData, handleChange, errors }) {
 AcademicInfoForm.propTypes = {
   formData : PropTypes.object,
   handleChange: PropTypes.func,
-  errors : PropTypes.object
+  errors : PropTypes.object,
+  supervisors : PropTypes.array,
 }

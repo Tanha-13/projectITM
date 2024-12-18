@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PersonalInfoForm from "../../components/Registration/PersonalInfoForm";
@@ -6,6 +6,9 @@ import AcademicInfoForm from "../../components/Registration/AcademicInfoForm";
 import RegistrationInfoForm from "../../components/Registration/RegistrationInfoForm";
 import { Separator } from "@/components/ui/separator";
 import { studentIdCheck } from "@/lib/studentIdCheck";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import waiting from "../../assets/img/waiting.png"
 
 const steps = [
   "Personal Information",
@@ -19,11 +22,11 @@ export default function Register() {
     firstName: "",
     lastName: "",
     email: "",
-    id: "",
+    studentId: "",
     gender: "",
     semester: "",
     batch: "",
-    registeredForThesis: "",
+    registeredForProject: "",
     proposalAccepted: "",
     supervisor: "",
     password: "",
@@ -31,6 +34,29 @@ export default function Register() {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [supervisors, setSupervisors] = useState([]);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchSupervisors();
+  }, []);
+
+  const fetchSupervisors = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/admin/supervisors"
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch supervisors");
+      }
+      const data = await response.json();
+      console.log(data);
+      setSupervisors(data);
+    } catch (error) {
+      console.error("Error fetching supervisors:", error);
+    }
+  };
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -42,51 +68,45 @@ export default function Register() {
     if (currentStep === 0) {
       if (!formData.firstName) newErrors.firstName = "First name is required";
       if (!formData.lastName) newErrors.lastName = "Last name is required";
-      if(!formData.email){
+      if (!formData.email) {
         newErrors.email = "Student Email is required";
+      } else {
+        if (!formData.email.endsWith("@diu.edu.bd"))
+          newErrors.email = "Valid DIU email is required";
       }
-      else{
-        if (!formData.email.endsWith("@diu.edu.bd")) newErrors.email = "Valid DIU email is required";
-      }
-      if (!formData.studentId){
+      if (!formData.studentId) {
         newErrors.studentId = "ID is required";
-      }
-      else{
+      } else {
         const middlePart = "-51-";
-          if(!studentIdCheck(formData.studentId,middlePart)){
-            newErrors.studentId = "Provide a valid student ID";
-          }
+        if (!studentIdCheck(formData.studentId, middlePart)) {
+          newErrors.studentId = "Provide a valid student ID";
         }
+      }
       if (!formData.gender) newErrors.gender = "Gender is required";
       if (!formData.semester) newErrors.semester = "Semester is required";
       if (!formData.batch) newErrors.batch = "Batch is required";
-    } 
+    }
     if (currentStep === 1) {
       if (!formData.registeredForProject)
         newErrors.registeredForProject = "This field is required";
       if (!formData.proposalAccepted)
         newErrors.proposalAccepted = "This field is required";
       if (!formData.supervisor) newErrors.supervisor = "Supervisor is required";
-    } 
+    }
     if (currentStep === 2) {
       if (!formData.password) {
         newErrors.password = "Password is required";
-      }
-      else{
+      } else {
         if (!/(?=.*[@$!%*?&])/.test(formData.password)) {
-          newErrors.password ="Special Character is required";
-        }
-        else if(!/(?=.*[A-Z])/.test(formData.password)){
-          newErrors.password ="One Uppercase Character is required";
-        }
-        else if(!/(?=.[0-9])/.test(formData.password)){
-          newErrors.password ="One Number is required";
-        }
-        else if(formData.password.length < 8){
-          newErrors.password ="Provide password between 8 to 12 characters";
-        }
-        else if(formData.password.length > 12){
-          newErrors.password ="Provide password between 8 to 12 characters";
+          newErrors.password = "Special Character is required";
+        } else if (!/(?=.*[A-Z])/.test(formData.password)) {
+          newErrors.password = "One Uppercase Character is required";
+        } else if (!/(?=.[0-9])/.test(formData.password)) {
+          newErrors.password = "One Number is required";
+        } else if (formData.password.length < 8) {
+          newErrors.password = "Provide password between 8 to 12 characters";
+        } else if (formData.password.length > 15) {
+          newErrors.password = "Provide password between 8 to 12 characters";
         }
       }
       if (!formData.confirmPassword)
@@ -94,8 +114,7 @@ export default function Register() {
       if (formData.password !== formData.confirmPassword)
         newErrors.confirmPassword = "Passwords do not match";
     }
-    if(isSubmitted){
-
+    if (isSubmitted) {
       setErrors(newErrors);
     }
     return Object.keys(newErrors).length === 0;
@@ -117,12 +136,48 @@ export default function Register() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitted(true);
+
     if (validateStep()) {
-      console.log("Form submitted:", formData);
-      // Here you would typically send the data to your backend
+      try {
+        const res = await fetch("http://localhost:3000/api/admin/add-student", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || "Registration failed");
+        }
+        Swal.fire({
+          title: "Registration Successful",
+          text: "Please wait for admin approval",
+          imageUrl: {waiting},
+          imageAlt: "Custom image",
+        });
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          studentId: "",
+          gender: "",
+          semester: "",
+          batch: "",
+          registeredForProject: "",
+          proposalAccepted: "",
+          supervisor: "",
+          password: "",
+          confirmPassword: "",
+        });
+        setCurrentStep(0);
+        navigate("/");
+      } catch (err) {
+        console.log("error", err);
+      }
     }
   };
 
@@ -133,7 +188,7 @@ export default function Register() {
           <CardTitle className="text-2xl md:text-3xl font-bold text-center">
             Student <span className="block md:inline">Registration Form</span>
           </CardTitle>
-          <Separator/>
+          <Separator />
         </CardHeader>
         <CardContent>
           {/* Stepper */}
@@ -184,6 +239,7 @@ export default function Register() {
                 formData={formData}
                 handleChange={handleChange}
                 errors={errors}
+                supervisors={supervisors}
               />
             )}
             {currentStep === 2 && (
@@ -204,7 +260,11 @@ export default function Register() {
                 </Button>
               )}
               {currentStep < steps.length - 1 ? (
-                <Button variant="internalBtn" onClick={handleNext} className="mx-auto w-1/2">
+                <Button
+                  variant="internalBtn"
+                  onClick={handleNext}
+                  className="mx-auto w-1/2"
+                >
                   Next
                 </Button>
               ) : (

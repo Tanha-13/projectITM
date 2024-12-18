@@ -8,7 +8,7 @@ const studentSchema = new mongoose.Schema({
   registeredForProject: { type: Boolean },
   proposalAccepted: { type: Boolean },
   studentStatus: { type: String, enum: ["pending", "approved", "declined"], default: "pending" },
-  supervisor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  supervisor: { type: mongoose.Schema.Types.ObjectId, ref: 'Supervisor' },
 }, { timestamps: true });
 
 module.exports = studentSchema;

@@ -51,7 +51,7 @@ databaseConnection().then(() => {
   app.use("/api/supervisor",supervisorRoutes);
   //student routing
   const studentRoutes = require("./api/routes/student");
-  app.use("/api/supervisor",studentRoutes);
+  app.use("/api/student",studentRoutes);
   // server
   const port = process.env.PORT || 5000;
   app.listen(port, () => {

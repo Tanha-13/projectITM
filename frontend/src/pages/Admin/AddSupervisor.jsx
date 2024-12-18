@@ -12,7 +12,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { generateTemporaryPassword } from "@/lib/generatePassword";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 export default function AddSupervisor() {
@@ -25,7 +24,7 @@ export default function AddSupervisor() {
     tempPassword: "",
   });
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
