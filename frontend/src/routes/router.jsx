@@ -102,15 +102,15 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path:"/student",
+        path:"/student/:userId",
         element:<StudentDashboard/>,
         children:[
             {
-                path:'/student',
+                path:'',
                 element:<StudentContent/>
             },
             {
-                path:"/student/projectDetails",
+                path:"projectDetails",
                 element:<ProjectDetails/>
             }
         ]

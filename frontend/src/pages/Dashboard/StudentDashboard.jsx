@@ -12,13 +12,13 @@ export default function StudentDashboard() {
     {
       id:1,
       title: "Dashboard",
-      url: "/student",
+      url: "",
       icon: FaHome,
     },
     {
       id:2,
       title: "Project Overview",
-      url: "/student/projectDetails",
+      url: "projectDetails",
       icon: FaProjectDiagram,
     },
     {

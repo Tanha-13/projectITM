@@ -3,6 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import login from "../../assets/img/login.png";
 import { Button } from "@/components/ui/button";
+import { useDispatch } from "react-redux";
+import Swal from "sweetalert2";
+import { setCredentials } from "@/redux/slice/authSlice";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -12,6 +15,7 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,42 +50,51 @@ export default function Login() {
     if (validateForm()) {
       try {
         const res = await fetch("http://localhost:3000/api/auth/login", {
-          method: 'POST',
+          method: "POST",
           headers: {
-            "Content-Type": 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
         });
         if (!res.ok) {
-          throw new Error('Server responded with an error');
+          throw new Error("Server responded with an error");
         }
         const data = await res.json();
-        console.log(data.role);
+        console.log(data);
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Login Successful",
+          showConfirmButton: false,
+          timer: 1000,
+        });
         localStorage.setItem("token", data.token);
         localStorage.setItem("userId", data._id);
-        if(data.role === 'admin'){
-        navigate(`/admin/${data._id}`);
-        }
-        else if(data.role === 'supervisor'){
+        dispatch(
+          setCredentials({
+            user: {
+              id: data._id,
+              email: data.email,
+              role: data.role,
+            },
+            token: data.token,
+          })
+        );
+
+        if (data.role === "admin") {
+          navigate(`/admin/${data._id}`);
+        } else if (data.role === "supervisor") {
           navigate(`/supervisor/${data._id}`);
+        } else if (data.role === "student") {
+          navigate(`/student/${data._id}`);
         }
-        
+
         // if (data.isFirstLogin && data.role === "supervisor") {
         //   navigate("/reset-password");
         // }
-        // else if(data.user.role === 'admin'){
-        //   navigate("/admin");
-        // }
-        // else if(data.user.role === 'supervisor'){
-        //   navigate("/supervisor");
-        // }
-        // else if(data.user.role === "student"){
-        //   navigate("/student");
-        // }
-
       } catch (err) {
         console.error(err);
-        setErrors({general:"Invalid email or password"})
+        setErrors({ general: "Invalid email or password" });
       }
     }
   };
