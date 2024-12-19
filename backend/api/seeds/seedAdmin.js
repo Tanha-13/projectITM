@@ -19,6 +19,7 @@ const seedAdmin = async() => {
             lastName:'Zaman',
             email:process.env.ADMIN_EMAIL,
             password: hashedPassword,
+            gender:'female',
             role:'admin'
         });
         await admin.save();

@@ -1,51 +1,68 @@
-const { connectToUserDB, getUserModel, getStudentModel } = require("../config/userDB");
+const {
+  connectToUserDB,
+  getUserModel,
+  getStudentModel,
+} = require("../config/userDB");
 const bcrypt = require("bcryptjs");
 const errorHandler = require("../utils/errors");
 
-const register = async(req,res,next) => {
-    try{
-        await connectToUserDB();
-        const User = getUserModel();
-        const Student = getStudentModel();
-        console.log((req.body));
-        const {firstName, lastName, email, studentId, gender, semester, batch, registeredForProject, proposalAccepted, supervisor, password} = req.body;
+const getStudentProfile = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+    await connectToUserDB();
+    const Student = getStudentModel();
+    const student = await Student.findOne({ user: id })
+      .populate("user", "-password")
+      .populate({
+        path: "supervisor",
+        populate: { path: "user" },
+      });
+    console.log(student);
 
-        const existingUser = await User.findOne({ email });
-        console.log(existingUser);
-        if (existingUser) {
-          return res.status(400).json({ message: "User already exists" });
-        }
-        const hashedPassword = bcrypt.hashSync(password,15);
-        const newUser = new User({
-            firstName,
-            lastName,
-            email,
-            password: hashedPassword,
-            role: "student",
-            gender,
-          });
-      
-          await newUser.save();
-          const newStudent = new Student({
-            user: newUser._id,
-            studentId,
-            semester,
-            batch,
-            registeredForProject: registeredForProject === "yes",
-            proposalAccepted: proposalAccepted === "yes",
-            supervisor,
-            studentStatus: "pending",
-          });
-          await newStudent.save();
-        res.status(200).json('message: Data received successfully');
-
-    }catch(err){
-        console.log(err);
-        next(errorHandler(500,"registration unsuccessful"));
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
     }
-
+    res.status(200).json({
+      ...student.toObject(),
+      ...student.user.toObject(),
+      department: "Department of Information Technology & Management (ITM)",
+      faculty: "Faculty of Science and Information Technology",
+      supervisor: `${student.supervisor.user.firstName} ${student.supervisor.user.lastName}`,
+    });
+  } catch (error) {
+    next(errorHandler(500, "Error getting student profile"));
+  }
+};
+const editStudentProfile = async (req, res, next) => {
+  try {
+    await connectToUserDB();
+    const Student = getStudentModel();
+    const { id } = req.params;
+    const student = await Student.findOne({ user: id });
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+    await User.findByIdAndUpdate(student.user, { firstName, lastName, email });
+    student.semester = semester;
+    student.batch = batch;
+    await student.save();
+    const updatedStudent = await Student.findOne({ user: id })
+      .populate("user", "-password")
+      .populate("supervisor");
+    res.status(200).json({
+      ...updatedStudent.toObject(),
+      ...updatedStudent.user.toObject(),
+      department: "Department of Information Technology & Management (ITM)",
+      faculty: "Faculty of Science and Information Technology",
+      supervisor: `${updatedStudent.supervisor.user.firstName} ${updatedStudent.supervisor.user.lastName}`,
+    });
+  } catch (error) {
+    next(errorHandler(500, "Error updating student profile"));
+  }
 };
 
 module.exports = {
-    register
-}
+  getStudentProfile,
+  editStudentProfile,
+};

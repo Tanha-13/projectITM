@@ -1,6 +1,7 @@
 const express = require("express");
-const { register } = require("../controllers/studentController");
+const { getStudentProfile, editStudentProfile } = require("../controllers/studentController");
 const router = express.Router();
 
-router.post("/register", register);
+router.get("/:id/profile",getStudentProfile);
+router.put("/:id/profile", editStudentProfile);
 module.exports = router;

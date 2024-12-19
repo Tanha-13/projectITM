@@ -307,6 +307,42 @@ const getStudentsByStatus = async (req, res, next) => {
   }
 };
 
+
+// get admin profile
+const getAdminProfile = async(req,res,next) => {
+  try{
+    await connectToUserDB();
+    const User = getUserModel();
+    const {id} = req.params;
+    const admin = await User.findById(id).select('-password');
+    
+    if (!admin) {
+      return next(errorHandler(404, "Admin not found"));
+    }
+    res.status(200).json(admin);
+  }catch(error){
+    console.error("Error in getAdminProfile:", error);
+    next(errorHandler(500, "Error getting admin profile"));
+  }
+}
+
+// edit admin profile
+const editAdminProfile = async(req,res,next) => {
+  try{
+    await connectToUserDB();
+    const User = getUserModel();
+    const {id} = req.params;
+    const updatedAdmin = await User.findByIdAndUpdate(id, req.body, { new: true }).select('-password');
+    if(!updatedAdmin){
+      return next(errorHandler(404, "Admin not found"));
+    }
+    res.status(200).json(updatedAdmin);
+}catch(error){
+    console.error("Error in editAdminProfile:", error);
+    next(errorHandler(500, "Error updating admin profile"));
+  }
+}
+
 module.exports = {
   addSupervisor,
   allSupervisors,
@@ -317,4 +353,6 @@ module.exports = {
   approveStudents,
   getStudentsByStatus,
   updateStudentStatus,
+  getAdminProfile,
+  editAdminProfile,
 };

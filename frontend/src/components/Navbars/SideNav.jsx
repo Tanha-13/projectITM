@@ -14,8 +14,6 @@ import {
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import lightlogo from "../../assets/logo/light-logo.png";
-
-// data flow - data,item,items
 function SideNav({ navItems }) {
   return (
     <Sidebar>

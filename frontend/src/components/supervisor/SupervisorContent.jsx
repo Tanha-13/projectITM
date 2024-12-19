@@ -3,17 +3,19 @@ import { Button } from "../ui/button";
 import InfoCardSupervisor from "./InfoCardSupervisor";
 import ProjectByType from "./ProjectByType";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function SupervisorContent() {
+  const currentUser = useSelector((state) => state.auth.user);
+  console.log(currentUser);
   return (
     <div className="p-2 bg-gray-50 min-h-screen">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-xl md:text-3xl text-left my-4">
-          Welcome <span className="hidden md:inline">Back</span>,{" "}
-          <span className="font-bold block lg:inline">Nusrat Jahan</span>
+        {`Welcome Back, ${currentUser.firstName} ${currentUser.gender === 'female' ? "Ma'am" : 'Sir'}`}
         </h1>
         <Link to="/supervisor/create-project">
-          <Button className="xl:me-10" variant="internalBtn">
+          <Button className="xl:me-10 hidden" variant="internalBtn">
             <FaPlus />
             Create Project
           </Button>

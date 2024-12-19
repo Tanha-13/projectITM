@@ -1,5 +1,5 @@
 const express = require('express');
-const { addSupervisor, allSupervisors, updateSupervisor, deleteSupervisor, allStudents, getStudentsByStatus, updateStudentStatus, pendingStudents, approveStudents, declineStudents, getStudentDetails } = require('../controllers/adminController');
+const { addSupervisor, allSupervisors, updateSupervisor, deleteSupervisor, allStudents, getStudentsByStatus, updateStudentStatus, getStudentDetails, getAdminProfile, editAdminProfile } = require('../controllers/adminController');
 const router = express.Router();
 
 router.post('/add-supervisor',addSupervisor);
@@ -13,5 +13,10 @@ router.get('/all-students',allStudents);
 //review student
 router.get('/students', getStudentsByStatus);
 router.put('/student/:id', updateStudentStatus);
+
+
+//profile
+router.get("/:id/profile",getAdminProfile);
+router.put("/:id/profile",editAdminProfile);
 
 module.exports = router;

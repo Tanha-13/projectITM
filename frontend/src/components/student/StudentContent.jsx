@@ -5,9 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Progress } from "@radix-ui/react-progress";
 import { Badge, Bell, Calendar, CheckCircle2, Clock, FileText, MessageSquare } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useSelector } from "react-redux";
 
 
 function StudentContent() {
+  const currentUser = useSelector((state) => state.auth.user);
     const project = {
         title: "AI in Healthcare",
         supervisor: "Dr. Jane Smith",
@@ -46,12 +48,11 @@ function StudentContent() {
       ];
   return (
     <div>
-      <p className="">Student</p>
       <SidebarInset>
         <div className="flex flex-1 flex-col gap-4 p-4">
           <div className="grid auto-rows-min gap-4 md:grid-cols-2 mb-10">
             <h1 className="text-3xl font-bold text-gray-900">
-              Student Dashboard
+            {`Welcome ${currentUser.firstName} ${currentUser.lastName}`}
             </h1>
             <Button variant="default">
               <Link to="/dashboard/student/project">View Full Project</Link>
