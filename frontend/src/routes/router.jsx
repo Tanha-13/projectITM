@@ -16,7 +16,7 @@ import Login from "@/pages/Login/Login";
 import ResetPassword from "@/pages/Login/ResetPassword";
 import ProfilePage from "@/pages/Profile/ProfilePage";
 import ProjectDetails from "@/pages/Project/ProjectDetails";
-import Projects from "@/pages/Project/Projects";
+import Projects from "@/pages/Project/SemesterProjects";
 import Register from "@/pages/Register/Register";
 import CreateProject from "@/pages/Supervisor/CreateProject";
 import { createBrowserRouter } from "react-router-dom";

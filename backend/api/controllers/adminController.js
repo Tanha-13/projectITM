@@ -165,6 +165,7 @@ const getStudentDetails = async (req, res, next) => {
     await connectToUserDB();
     const User = getUserModel();
     const Student = getStudentModel();
+    const Supervisor = getSupervisorModel();
     console.log(req.body);
     const {
       firstName,
@@ -207,7 +208,15 @@ const getStudentDetails = async (req, res, next) => {
       studentStatus: "pending",
     });
     await newStudent.save();
-    res.status(200).json("message: Data received successfully");
+
+    // Update the supervisor's students array
+    await Supervisor.findByIdAndUpdate(
+      supervisor,
+      { $push: { students: newStudent._id } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Data received successfully" });
   } catch (err) {
     console.log(err);
     next(errorHandler(500, "registration unsuccessful"));
@@ -241,7 +250,6 @@ const updateStudentStatus = async (req, res, next) => {
     await connectToUserDB();
     const Student = getStudentModel();
     const User = getUserModel();
-    const Supervisor = getSupervisorModel();
     const { id } = req.params;
     const { status } = req.body;
     console.log(id, status);

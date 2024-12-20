@@ -15,8 +15,6 @@ let User, Student, Supervisor;
 const connectToUserDB = async () => {
   if (!userConnection) {
     userConnection = await mongoose.createConnection(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       dbName: dbName,
     });
     User = userConnection.model("User", userSchema);

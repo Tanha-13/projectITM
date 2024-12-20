@@ -52,6 +52,9 @@ databaseConnection().then(() => {
   //student routing
   const studentRoutes = require("./api/routes/student");
   app.use("/api/student",studentRoutes);
+  //project routing
+  
+  
   // server
   const port = process.env.PORT || 5000;
   app.listen(port, () => {

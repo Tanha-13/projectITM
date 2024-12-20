@@ -40,7 +40,7 @@ const semesters = [
   { id: 7, name: "Spring 2023", projects: 4, thesis: 2, batch: "7th" },
 ];
 
-function Projects() {
+function SemesterProjects() {
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
@@ -121,7 +121,7 @@ function Projects() {
                         : "bg-third"
                     } text-gray-50 font-medium flex items-center justify-around min-h-12 rounded-b-md`}
                   >
-                    <p className="text-sm ">Project: {semester.projects}</p>
+                    <p className="text-sm ">Project: {semester.SemesterProjects}</p>
                     <p className="text-sm ">Thesis: {semester.thesis}</p>
                   </CardContent>
                 </Card>
@@ -235,5 +235,5 @@ function Projects() {
   );
 }
 
-export default Projects;
+export default SemesterProjects;
 
