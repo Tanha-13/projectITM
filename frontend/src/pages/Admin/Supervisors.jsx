@@ -38,69 +38,6 @@ import {
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 
-// const mockSupervisors = [
-//   {
-//     id: 1,
-//     name: "John Doe",
-//     email: "john@example.com",
-//     designation: "Senior Supervisor",
-//   },
-//   {
-//     id: 2,
-//     name: "Jane Smith",
-//     email: "jane@example.com",
-//     designation: "Team Lead",
-//   },
-//   {
-//     id: 3,
-//     name: "Bob Johnson",
-//     email: "bob@example.com",
-//     designation: "Department Manager",
-//   },
-//   {
-//     id: 4,
-//     name: "Alice Brown",
-//     email: "alice@example.com",
-//     designation: "Project Supervisor",
-//   },
-//   {
-//     id: 5,
-//     name: "Charlie Davis",
-//     email: "charlie@example.com",
-//     designation: "Assistant Manager",
-//   },
-//   {
-//     id: 6,
-//     name: "Eva Wilson",
-//     email: "eva@example.com",
-//     designation: "Senior Supervisor",
-//   },
-//   {
-//     id: 7,
-//     name: "Frank Miller",
-//     email: "frank@example.com",
-//     designation: "Team Lead",
-//   },
-//   {
-//     id: 8,
-//     name: "Grace Lee",
-//     email: "grace@example.com",
-//     designation: "Department Manager",
-//   },
-//   {
-//     id: 9,
-//     name: "Henry Taylor",
-//     email: "henry@example.com",
-//     designation: "Project Supervisor",
-//   },
-//   {
-//     id: 10,
-//     name: "Ivy Chen",
-//     email: "ivy@example.com",
-//     designation: "Assistant Manager",
-//   },
-// ];
-
 function Supervisors() {
   const [supervisors, setSupervisors] = useState([]);
   const [search, setSearch] = useState("");
@@ -224,13 +161,21 @@ function Supervisors() {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setEditingSupervisor((prev) => ({
-      ...prev,
-      user: {
-        ...prev.user,
-        [name]: value,
-      },
-    }));
+    setEditingSupervisor((prev) => {
+      if (name === "designation") {
+        return {
+          ...prev,
+          designation: value,
+        };
+      }
+      return{
+        ...prev,
+        user:{
+          ...prev.user,
+          [name]:value,
+        }
+      }
+    });
   };
 
   const handlePageChange = (newPage) => {
@@ -365,7 +310,7 @@ function Supervisors() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-3xl text-center">
+            <DialogTitle className="text-3xl text-center" autoFocus>
               Edit Details
             </DialogTitle>
             <Separator />
@@ -419,6 +364,7 @@ function Supervisors() {
                 className="col-span-3"
               />
             </div>
+            
           </div>
           <div className="flex justify-between w-full space-x-2">
             <Button

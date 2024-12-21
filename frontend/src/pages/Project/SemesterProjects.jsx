@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -8,10 +8,26 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import ProjectList from "./ProjectList";
 import { useSelector } from "react-redux";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function SemesterProjects() {
   const [projects, setProjects] = useState([]);
@@ -20,22 +36,27 @@ function SemesterProjects() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const itemsPerPage = 6;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
 
   const { userId } = useParams();
   const navigate = useNavigate();
-  const currentUser = useSelector(state => state.auth.user);
-  console.log(currentUser);
+  const location = useLocation();
+  const currentUser = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     const fetchProjects = async () => {
       setIsLoading(true);
       try {
         let response;
-        if (currentUser.role === 'admin') {
-          response = await fetch(`http://localhost:3000/api/admin/${userId}/semester-projects`);
-        } else if (currentUser.role === 'supervisor') {
-          response = await fetch(`http://localhost:3000/api/supervisor/${userId}/semester-projects`);
+        if (currentUser.role === "admin") {
+          response = await fetch(
+            `http://localhost:3000/api/admin/${userId}/semester-projects`
+          );
+        } else if (currentUser.role === "supervisor") {
+          response = await fetch(
+            `http://localhost:3000/api/supervisor/${userId}/semester-projects`
+          );
         } else {
           throw new Error("Invalid user role");
         }
@@ -53,8 +74,8 @@ function SemesterProjects() {
     };
 
     fetchProjects();
-  }, [userId,currentUser.role]);
-
+  }, [userId, currentUser.role]);
+  console.log(projects);
   useEffect(() => {
     const groupedSemesters = projects.reduce((acc, project) => {
       const key = `${project.student.semester}-${project.student.batch}`;
@@ -81,9 +102,17 @@ function SemesterProjects() {
       projectTypeCounts: group.projectCounts,
     }));
 
+    // Sort groupedData by batch in ascending order
+    groupedData.sort((a, b) => {
+      const batchA = parseInt(a.batch.match(/\d+/)?.[0] || "0", 10);
+      const batchB = parseInt(b.batch.match(/\d+/)?.[0] || "0", 10);
+      return batchA - batchB;
+    });
+
     setSemesters(groupedData);
     setFilteredSemesters(groupedData);
   }, [projects]);
+  console.log(semesters);
 
   useEffect(() => {
     const filtered = semesters.filter(
@@ -97,12 +126,26 @@ function SemesterProjects() {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentSemesters = filteredSemesters.slice(
+  const currentItems = filteredSemesters.slice(
     indexOfFirstItem,
     indexOfLastItem
   );
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  useEffect(() => {
+    const totalPages = Math.ceil(filteredSemesters.length / itemsPerPage);
+    setTotalPages(totalPages);
+  }, [filteredSemesters, itemsPerPage]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handleItemsPerPageChange = (value) => {
+    setItemsPerPage(Number(value));
+    setCurrentPage(1);
+  };
 
   const handleSemesterClick = (semester) => {
     const formattedSemester = semester.semester.replace(/\s+/g, "-");
@@ -116,7 +159,14 @@ function SemesterProjects() {
   }
 
   if (projects.length === 0) {
-    return <div>No projects and theses for any semester</div>;
+    return (
+      <div className="flex justify-center items-center h-[80%]">
+        No projects and theses for any semester.{" "}
+        <Link className="text-secondary text-base underline">
+          Create Project
+        </Link>
+      </div>
+    );
   }
 
   // Check if we're on a project list page
@@ -140,7 +190,7 @@ function SemesterProjects() {
             </h1>
             <Separator className="mb-9" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-h-40">
-              {currentSemesters.map((semester, index) => (
+              {currentItems.map((semester, index) => (
                 <Card
                   key={index}
                   className={`cursor-pointer hover:shadow-md transition-shadow rounded-md border-t-4 ${
@@ -172,19 +222,58 @@ function SemesterProjects() {
                 </Card>
               ))}
             </div>
-            <div className="mt-4 flex justify-center">
-              {Array.from(
-                { length: Math.ceil(filteredSemesters.length / itemsPerPage) },
-                (_, i) => (
-                  <Button
-                    key={i}
-                    onClick={() => paginate(i + 1)}
-                    className="mx-1"
-                  >
-                    {i + 1}
-                  </Button>
-                )
-              )}
+            <div className="mt-4 flex justify-between items-center">
+              <div className="flex items-center gap-5 mt-2 md:mt-0 mb-5 md:mb-0">
+                <Label htmlFor="items-per-page">Show Semester:</Label>
+                <Select
+                  value={itemsPerPage.toString()}
+                  onValueChange={handleItemsPerPageChange}
+                >
+                  <SelectTrigger className="w-[100px] ">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="cursor-pointer disabled:opacity-50"
+                      />
+                      <PaginationLink>{currentPage}</PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                      {totalPages > 2 && currentPage < totalPages - 1 && (
+                        <PaginationItem>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )}
+                      {currentPage < totalPages && (
+                        <PaginationItem>
+                          <PaginationLink
+                            onClick={() => handlePageChange(totalPages)}
+                          >
+                            {totalPages}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )}
+                      <PaginationNext
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
             </div>
           </>
         ) : (
@@ -196,4 +285,3 @@ function SemesterProjects() {
 }
 
 export default SemesterProjects;
-

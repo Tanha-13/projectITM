@@ -285,7 +285,9 @@ function StudentsAdmin() {
               <TableCell>{`${student.user.firstName} ${student.user.lastName}`}</TableCell>
               <TableCell>{student.user.email}</TableCell>
               <TableCell>{student.studentId}</TableCell>
-              <TableCell>{`${student.supervisor.user.firstName} ${student.supervisor.user.lastName}`}</TableCell>
+              <TableCell>
+              {/* {`${student.supervisor.user.firstName} ${student.supervisor.user.lastName}`} */}
+              </TableCell>
               <TableCell>{student.semester}</TableCell>
               <TableCell>{student.batch}</TableCell>
               <TableCell>

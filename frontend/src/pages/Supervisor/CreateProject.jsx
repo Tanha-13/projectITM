@@ -268,6 +268,7 @@ function CreateProject() {
                   value={formData.description}
                   onChange={handleChange}
                   className={errors.description ? "border-red-600" : ""}
+                  rows={7}
                 />
                 {errors.description && (
                   <p className="text-sm text-red-600">{errors.description}</p>

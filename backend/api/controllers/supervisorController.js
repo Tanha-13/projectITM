@@ -95,12 +95,28 @@ const getProjectDetails = async (req, res) => {
       endDate,
       status: "not-started",
       assignee,
-      student: student._id,
-      supervisor: supervisor._id,
+      student: {
+        _id: student._id,
+        userId: student.user._id,
+        firstName: student.user.firstName,
+        lastName: student.user.lastName,
+        email: student.user.email,
+        studentId: student.studentId,
+        semester: student.semester,
+        batch: student.batch
+      },
+      supervisor: {
+        _id: supervisor._id,
+        userId: supervisor.user._id,
+        firstName: supervisor.user.firstName,
+        lastName: supervisor.user.lastName,
+        email: supervisor.user.email,
+        designation: supervisor.designation
+      }
     });
     await newProject.save();
 
-    // supervisor.projects.push(newProject._id);
+    supervisor.projects.push(newProject._id);
     await supervisor.save();
 
     // Update student's project and status
@@ -136,21 +152,27 @@ const semesterProjects = async (req, res) => {
 
     const { id } = req.params;
     const Project = getProjectModel();
-    const Student = getStudentModel();
     const Supervisor = getSupervisorModel();
     const supervisor = await Supervisor.findOne({ user: id }).populate("user");
+    console.log(supervisor);
     if (!supervisor) {
       return res.status(404).json({ message: "Supervisor not found" });
     }
 
-    const projects = await Project.find({ supervisor: supervisor._id }).lean();
+    const projects = await Project.find({
+      $or: [
+        { supervisor: supervisor._id },
+        { supervisor: supervisor.user._id }
+      ]
+    }).lean();
+    console.log(projects.length);
 
     for (let project of projects) {
       if (project.assignee) {
         const Student = getStudentModel();
         const student = await Student.findById(project.assignee).populate(
           "user"
-        );
+        ).lean();
         if (student) {
           project.student = {
             _id: student.user._id,
@@ -178,14 +200,13 @@ const semesterProjects = async (req, res) => {
 };
 
 const updateProjects = async (req, res, next) => {
-  const {id,projectId} = req.params;
-  console.log(id,projectId);
-  console.log(req,body);
   try {
+
     await connectToProjectDB();
     const Project = getProjectModel();
     const { id, projectId } = req.params;
     const updateData = req.body;
+    console.log(id,projectId,updateData);
 
     const updatedProject = await Project.findByIdAndUpdate(
       projectId,
@@ -223,12 +244,12 @@ const deleteProjects = async (req, res, next) => {
 };
 const updateStatusProjects = async (req, res, next) => {
   const { id, projectId } = req.params;
-    console.log(id,projectId);
+  console.log(id, projectId);
   try {
     await connectToProjectDB();
     const Project = getProjectModel();
     const { id, projectId } = req.params;
-    console.log(id,projectId);
+    console.log(id, projectId);
     const { status } = req.body;
 
     const updatedProject = await Project.findByIdAndUpdate(

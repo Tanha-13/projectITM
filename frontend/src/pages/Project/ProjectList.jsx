@@ -39,7 +39,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Swal from "sweetalert2";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 
 function ProjectList() {
   const [projects, setProjects] = useState([]);
@@ -120,9 +119,12 @@ function ProjectList() {
       });
 
       if (result.isConfirmed) {
-        const response = await fetch(`http://localhost:5173/supervisor/${currentUser.id}/projects/${projectId}`,{
-          method:"DELETE",
-        })
+        const response = await fetch(
+          `http://localhost:3000/supervisor/${currentUser.id}/projects/${projectId}`,
+          {
+            method: "DELETE",
+          }
+        );
         if (!response.ok) {
           throw new Error("Failed to delete project");
         }
@@ -148,14 +150,17 @@ function ProjectList() {
 
   const handleStatusChange = async (projectId, newStatus) => {
     try {
-      const res = await fetch(`http://localhost:5173/supervisor/${currentUser.id}/projects/${projectId}`,{
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus }),
-      })
-      if(!res.ok){
+      const res = await fetch(
+        `http://localhost:3000/supervisor/${currentUser.id}/projects/${projectId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+      if (!res.ok) {
         throw new Error("Failed to update project status");
       }
       const data = await res.json();
@@ -180,7 +185,7 @@ function ProjectList() {
   const handleSaveEdit = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5173/api/supervisor/${currentUser.id}/projects/${editingProject._id}`,
+        `http://localhost:3000/api/supervisor/${currentUser.id}/projects/${editingProject._id}`,
         {
           method: "PUT",
           headers: {
@@ -217,6 +222,11 @@ function ProjectList() {
     }
   };
 
+  const handleCancelEdit = () => {
+    setEditingProject(null);
+    setIsEditDialogOpen(false);
+  };
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setEditingProject((prev) => ({
@@ -225,10 +235,12 @@ function ProjectList() {
     }));
   };
 
+  const handleViewProject = () => {};
+
   return (
     <div className="p-1 lg:p-10 min-h-screen bg-gray-50">
       <h2 className="text-3xl font-semibold mb-4">
-        Projects for {semesterData?.semester} - {semesterData?.batch}
+        {semesterData?.semester} - {semesterData?.batch}
       </h2>
       <div className="md:flex items-center justify-between gap-3 my-10">
         <Input
@@ -266,7 +278,8 @@ function ProjectList() {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[50px]">S.No</TableHead>
-            <TableHead>Project Name</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Title</TableHead>
             <TableHead>Project Type</TableHead>
             <TableHead>Student ID</TableHead>
             <TableHead>Student Email</TableHead>
@@ -285,6 +298,7 @@ function ProjectList() {
                 {indexOfFirstProject + index + 1}
               </TableCell>
               <TableCell>{project.name}</TableCell>
+              <TableCell>{project.title}</TableCell>
               <TableCell>{project.projectType}</TableCell>
               <TableCell>{project.student.studentId}</TableCell>
               <TableCell>{project.student.email}</TableCell>
@@ -301,7 +315,7 @@ function ProjectList() {
               <TableCell className="flex justify-center">
                 <Button
                   variant="internalBtn"
-                  onClick={() => handleView(project)}
+                  onClick={() => handleViewProject(project)}
                 >
                   View
                 </Button>
@@ -336,7 +350,7 @@ function ProjectList() {
           ))}
         </TableBody>
       </Table>
-      <div className="md:mt-5">
+      <div className="md:flex items-center justify-between md:mt-5">
         <div className="flex items-center gap-5 mt-2 md:mt-0 mb-5 md:mb-0">
           <Label htmlFor="items-per-page">Show Projects:</Label>
           <Select
@@ -354,39 +368,41 @@ function ProjectList() {
             </SelectContent>
           </Select>
         </div>
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="cursor-pointer disabled:opacity-50"
-              />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink>{currentPage}</PaginationLink>
-            </PaginationItem>
-            {totalPages > 2 && currentPage < totalPages - 1 && (
+        <div>
+          <Pagination>
+            <PaginationContent>
               <PaginationItem>
-                <PaginationEllipsis />
+                <PaginationPrevious
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="cursor-pointer disabled:opacity-50"
+                />
               </PaginationItem>
-            )}
-            {currentPage < totalPages && (
               <PaginationItem>
-                <PaginationLink onClick={() => handlePageChange(totalPages)}>
-                  {totalPages}
-                </PaginationLink>
+                <PaginationLink>{currentPage}</PaginationLink>
               </PaginationItem>
-            )}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="cursor-pointer disabled:opacity-50"
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+              {totalPages > 2 && currentPage < totalPages - 1 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              {currentPage < totalPages && (
+                <PaginationItem>
+                  <PaginationLink onClick={() => handlePageChange(totalPages)}>
+                    {totalPages}
+                  </PaginationLink>
+                </PaginationItem>
+              )}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="cursor-pointer disabled:opacity-50"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
@@ -507,7 +523,7 @@ function ProjectList() {
             <Button
               className="w-1/2"
               variant="destructive"
-              onClick={() => setIsEditDialogOpen(false)}
+              onClick={handleCancelEdit}
             >
               Cancel
             </Button>
