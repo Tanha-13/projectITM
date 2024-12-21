@@ -21,13 +21,13 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { format, addMonths } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
-import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 
 function CreateProject() {
   const [projectType, setProjectType] = useState(null);
   const [formData, setFormData] = useState({
+    projectType: "",
     name: "",
     title: "",
     description: "",
@@ -101,7 +101,7 @@ function CreateProject() {
       (end.getMonth() - start.getMonth())
     );
   };
-
+  
   const validateForm = () => {
     let newErrors = {};
     if (!formData.name) newErrors.name = `${projectType} Name is required`;
@@ -174,6 +174,7 @@ function CreateProject() {
               "success"
             );
             setFormData({
+              projectType:'',
               name: "",
               title: "",
               description: "",
@@ -184,6 +185,7 @@ function CreateProject() {
               endDate: null,
               assignee: "",
             });
+            setProjectType(null);
           } catch (error) {
             console.log("error", error);
             setErrors({
@@ -207,14 +209,17 @@ function CreateProject() {
     <div className="p-2 md:p-10 min-h-screen bg-gray-50">
       <Card className="p-10 max-w-7xl mx-auto w-full">
         <h1 className="text-3xl font-semibold md:text-4xl">
-          Create {projectType || "Project/Thesis"}
+          Create {formData.projectType || "Project/Thesis"}
         </h1>
         <Separator className="my-4" />
         <CardContent>
           <div className="my-6 text-center">
             <h2 className="text-xl font-semibold mb-2">Select Type</h2>
             <RadioGroup
-              onValueChange={setProjectType}
+              onValueChange={(value) => {
+                setProjectType(value);
+                setFormData((prevData) => ({ ...prevData, projectType: value }));
+              }}
               className="flex space-x-4 justify-around border p-2 rounded-sm shadow-sm"
             >
               <div className="flex items-center space-x-2">

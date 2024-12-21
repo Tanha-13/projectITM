@@ -7,6 +7,7 @@ const {
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const errorHandler = require("../utils/errors");
+const { connectToProjectDB, getProjectModel } = require("../config/projectDB");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -263,11 +264,13 @@ const updateStudentStatus = async (req, res, next) => {
         path: "supervisor",
         populate: { path: "user" },
       });
-      console.log(updatedStudent);
-    
+    console.log(updatedStudent);
+
     if (status === "approved") {
       // Send email to supervisor
-      const supervisor = await User.findById(updatedStudent.supervisor.user._id);
+      const supervisor = await User.findById(
+        updatedStudent.supervisor.user._id
+      );
       console.log(supervisor);
       if (supervisor) {
         await transporter.sendMail({
@@ -315,41 +318,101 @@ const getStudentsByStatus = async (req, res, next) => {
   }
 };
 
+// get semester projects
+const adminSemesterProjects = async (req, res, next) => {
+  try {
+    await connectToProjectDB();
+    const Project = getProjectModel();
+    const projects = await Project.find()
+      .populate({
+        path: "student",
+        populate: { path: "user", select: "-password" },
+      })
+      .populate({
+        path: "supervisor",
+        populate: { path: "user", select: "-password" },
+      });
+
+
+    const enrichedProjects = await Promise.all(
+      projects.map(async (project) => {
+        // Enrich student details if project has an assignee
+        if (project.assignee) {
+          const Student = getStudentModel();
+          const student = await Student.findById(project.assignee).populate("user");
+          if (student) {
+            project.student = {
+              _id: student.user._id,
+              firstName: student.user.firstName,
+              lastName: student.user.lastName,
+              email: student.user.email,
+              studentId: student.studentId,
+              semester: student.semester,
+              batch: student.batch,
+            };
+          }
+        }
+
+        // Enrich supervisor details if present
+        if (project.supervisor && project.supervisor.user) {
+          project.supervisor = {
+            _id: project.supervisor._id,
+            firstName: project.supervisor.user.firstName,
+            lastName: project.supervisor.user.lastName,
+            email: project.supervisor.user.email,
+          };
+        } else {
+          project.supervisor = null; // Explicitly set to null if no supervisor
+        }
+
+        return project;
+      })
+    );
+
+    res.status(200).json(enrichedProjects);
+  } catch (error) {
+    next(errorHandler(500, "Error getting semester projects"));
+  }
+};
+const projectList = async (req, res) => {};
+const projectDetails = async (req, res) => {};
 
 // get admin profile
-const getAdminProfile = async(req,res,next) => {
-  try{
+const getAdminProfile = async (req, res, next) => {
+  try {
     await connectToUserDB();
     const User = getUserModel();
-    const {id} = req.params;
-    const admin = await User.findById(id).select('-password');
-    
+    const { id } = req.params;
+    const admin = await User.findById(id).select("-password");
+
     if (!admin) {
       return next(errorHandler(404, "Admin not found"));
     }
     res.status(200).json(admin);
-  }catch(error){
+  } catch (error) {
     console.error("Error in getAdminProfile:", error);
     next(errorHandler(500, "Error getting admin profile"));
   }
-}
+};
 
 // edit admin profile
-const editAdminProfile = async(req,res,next) => {
-  try{
+const editAdminProfile = async (req, res, next) => {
+  try {
     await connectToUserDB();
     const User = getUserModel();
-    const {id} = req.params;
-    const updatedAdmin = await User.findByIdAndUpdate(id, req.body, { new: true }).select('-password');
-    if(!updatedAdmin){
+    const { id } = req.params;
+    const updatedAdmin = await User.findByIdAndUpdate(id, req.body, {
+      new: true,
+    }).select("-password");
+    if (!updatedAdmin) {
       return next(errorHandler(404, "Admin not found"));
     }
     res.status(200).json(updatedAdmin);
-}catch(error){
+  } catch (error) {
     console.error("Error in editAdminProfile:", error);
     next(errorHandler(500, "Error updating admin profile"));
   }
-}
+};
 
 module.exports = {
   addSupervisor,
@@ -361,6 +424,9 @@ module.exports = {
   approveStudents,
   getStudentsByStatus,
   updateStudentStatus,
+  adminSemesterProjects,
+  projectList,
+  projectDetails,
   getAdminProfile,
   editAdminProfile,
 };

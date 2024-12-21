@@ -27,7 +27,7 @@ function SupervisorDashboard() {
     {
       id: 2,
       title: "Projects",
-      url: "projects",
+      url: "semester-projects",
       icon: FaProjectDiagram,
       subItems: [
         {
@@ -39,7 +39,7 @@ function SupervisorDashboard() {
         {
           id: 2.2,
           title: "All",
-          url: "projects",
+          url: "semester-projects",
           icon: FaMinus,
         },
       ],

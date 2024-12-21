@@ -16,6 +16,7 @@ import Login from "@/pages/Login/Login";
 import ResetPassword from "@/pages/Login/ResetPassword";
 import ProfilePage from "@/pages/Profile/ProfilePage";
 import ProjectDetails from "@/pages/Project/ProjectDetails";
+import ProjectList from "@/pages/Project/ProjectList";
 import Projects from "@/pages/Project/SemesterProjects";
 import Register from "@/pages/Register/Register";
 import CreateProject from "@/pages/Supervisor/CreateProject";
@@ -73,8 +74,16 @@ const router = createBrowserRouter([
         element: <StudentsAdmin />,
       },
       {
-        path: "projects",
+        path: "semester-projects",
         element: <Projects />,
+      },
+      {
+        path:"projects/:semester",
+        element:<ProjectList/>
+      },
+      {
+        path:"projects/:semester/:projectId",
+        element:<ProjectDetails/>
       },
       {
         path: "notifications",
@@ -95,12 +104,20 @@ const router = createBrowserRouter([
         element: <SupervisorContent />,
       },
       {
-        path: "projects",
+        path: "semester-projects",
         element: <Projects />,
       },
       {
         path: "create-project",
         element: <CreateProject />,
+      },
+      {
+        path:"projects/:semester",
+        element:<ProjectList/>
+      },
+      {
+        path:"projects/:semester/:projectId",
+        element:<ProjectDetails/>
       },
       {
         path: "profile",

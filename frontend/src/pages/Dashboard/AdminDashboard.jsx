@@ -69,7 +69,7 @@ function AdminDashboard() {
     {
       id: 4,
       title: "Projects",
-      url: "projects",
+      url: "semester-projects",
       icon: FaProjectDiagram,
     },
     {

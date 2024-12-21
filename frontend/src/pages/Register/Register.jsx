@@ -70,10 +70,11 @@ export default function Register() {
       if (!formData.lastName) newErrors.lastName = "Last name is required";
       if (!formData.email) {
         newErrors.email = "Student Email is required";
-      } else {
-        if (!formData.email.endsWith("@diu.edu.bd"))
-          newErrors.email = "Valid DIU email is required";
-      }
+      } 
+      // else {
+      //   if (!formData.email.endsWith("@diu.edu.bd"))
+      //     newErrors.email = "Valid DIU email is required";
+      // }
       if (!formData.studentId) {
         newErrors.studentId = "ID is required";
       } else {
