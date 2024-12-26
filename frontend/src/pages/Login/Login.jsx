@@ -79,6 +79,10 @@ export default function Login() {
               lastName:data.lastName,
               gender: data.gender,
               role: data.role,
+              semester:data?.studentDetails?.semester || null,
+              projectId: data?.studentDetails?.project || null,
+              studentId: data?.studentDetails?.studentId || null,
+              batch: data?.studentDetails?.batch || null,
             },
             token: data.token,
           })

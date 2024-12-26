@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link, useLocation, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,6 +39,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Swal from "sweetalert2";
 import { Textarea } from "@/components/ui/textarea";
+import { setCurrentProject } from "@/redux/slice/projectSlice";
 
 function ProjectList() {
   const [projects, setProjects] = useState([]);
@@ -54,7 +55,9 @@ function ProjectList() {
   const location = useLocation();
   const semesterData = location.state?.semesterData;
   const currentUser = useSelector((state) => state.auth.user);
-  console.log(currentUser);
+  const {semester} = useParams();
+  
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (semesterData?.projects) {
@@ -83,9 +86,6 @@ function ProjectList() {
     indexOfLastProject
   );
   const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
-
-  console.log(currentProjects);
-  console.log(editingProject);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
@@ -235,7 +235,10 @@ function ProjectList() {
     }));
   };
 
-  const handleViewProject = () => {};
+  const handleViewProject = (project) => {
+    dispatch(setCurrentProject(project));
+
+  };
 
   return (
     <div className="p-1 lg:p-10 min-h-screen bg-gray-50">
@@ -313,12 +316,14 @@ function ProjectList() {
               </TableCell>
               <TableCell>{`${project.semester} ${project.year}`}</TableCell>
               <TableCell className="flex justify-center">
-                <Button
-                  variant="internalBtn"
-                  onClick={() => handleViewProject(project)}
-                >
-                  View
-                </Button>
+                <Link to={`/${currentUser.role}/${currentUser.id}/projects/${semester}/${project._id}`}>
+                  <Button
+                    variant="internalBtn"
+                    onClick={() => handleViewProject(project)}
+                  >
+                    View
+                  </Button>
+                </Link>
               </TableCell>
               {currentUser.role === "admin" && (
                 <TableCell>

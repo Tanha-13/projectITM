@@ -38,6 +38,7 @@ function SemesterProjects() {
   const [isLoading, setIsLoading] = useState(true);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
+  
 
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -65,6 +66,8 @@ function SemesterProjects() {
         }
         const data = await response.json();
         setProjects(data);
+
+
       } catch (error) {
         console.error("Error fetching projects:", error);
         // Handle error (e.g., show error message to user)
@@ -75,7 +78,6 @@ function SemesterProjects() {
 
     fetchProjects();
   }, [userId, currentUser.role]);
-  console.log(projects);
   useEffect(() => {
     const groupedSemesters = projects.reduce((acc, project) => {
       const key = `${project.student.semester}-${project.student.batch}`;

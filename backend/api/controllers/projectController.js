@@ -1,61 +1,39 @@
-// const { connectToProjectDB, getProjectModel } = require('../config/projectDB');
-// const { connectToUserDB, getStudentModel, getSupervisorModel } = require('../config/userDB');
-// const errorHandler = require('../utils/errors');
+const { populate } = require("dotenv");
+const { connectToProjectDB, getProjectModel } = require("../config/projectDB");
+const {
+  connectToUserDB,
+  getStudentModel,
+  getSupervisorModel,
+} = require("../config/userDB");
+const errorHandler = require("../utils/errors");
 
-// exports.createProject = async (req, res, next) => {
-//   try {
-//     await connectToProjectDB();
-//     await connectToUserDB();
-//     const Project = getProjectModel();
-//     const Student = getStudentModel();
-//     const Supervisor = getSupervisorModel();
-
-//     const { title, description, studentId, supervisorId } = req.body;
-
-//     const student = await Student.findById(studentId);
-//     const supervisor = await Supervisor.findById(supervisorId);
-
-//     if (!student || !supervisor) {
-//       return next(errorHandler(404, 'Student or Supervisor not found'));
-//     }
-
-//     const newProject = new Project({
-//       title,
-//       description,
-//       student: studentId,
-//       supervisor: supervisorId,
-//     });
-
-//     await newProject.save();
-
-//     student.project = newProject._id;
-//     await student.save();
-
-//     supervisor.projects.push(newProject._id);
-//     await supervisor.save();
-
-//     res.status(201).json(newProject);
-//   } catch (error) {
-//     next(errorHandler(500, 'Error creating project'));
-//   }
-// };
-
-// exports.getProject = async (req, res, next) => {
-//   try {
-//     await connectToProjectDB();
-//     const Project = getProjectModel();
-//     const project = await Project.findById(req.params.id)
-//       .populate('student', 'studentId')
-//       .populate('supervisor', 'user')
-//       .populate('tasks');
-//     if (!project) {
-//       return next(errorHandler(404, 'Project not found'));
-//     }
-//     res.status(200).json(project);
-//   } catch (error) {
-//     next(errorHandler(500, 'Error getting project'));
-//   }
-// };
+const getProject = async (req, res, next) => {
+  try {
+    await connectToProjectDB();
+    await connectToUserDB();
+    const projectDB = getProjectModel();
+    const project = await projectDB.findById(req.params.id);
+    const Student = getStudentModel();
+    const student = await Student.findById(project.assignee).populate({
+      path:"user",
+      select:"-password"
+    });
+    const Supervisor = getSupervisorModel();
+    const projectSupervisor = await Supervisor.findById(student.supervisor).populate({
+      path:"user",
+      select:"-password"
+    });
+    project.student = student;
+    project.supervisor = projectSupervisor;
+    
+    if (!project) {
+      return next(errorHandler(404, "Project not found"));
+    }
+    res.status(200).json(project);
+  } catch (error) {
+    next(errorHandler(500, "Error getting project"));
+  }
+};
 
 // exports.updateProject = async (req, res, next) => {
 //   try {
@@ -108,3 +86,6 @@
 //   }
 // };
 
+module.exports = {
+  getProject,
+};

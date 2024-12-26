@@ -7,7 +7,7 @@ const projectSchema = new mongoose.Schema({
   description: { type: String, required: true },
   semester: {type: String},
   year: {type: Number},
-  status: { type: String, enum: ['not-started','in-progress', 'completed'], default: 'not-started' },
+  status: { type: String, enum: ['Not started','In progress', 'Completed'], default: 'Not started' },
   startDate: { type: Date, default: Date.now },
   endDate: { type: Date },
   assignee:{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' },

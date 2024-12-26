@@ -3,10 +3,14 @@ import SideNav from "@/components/Navbars/SideNav";
 import UserNav from "@/components/Navbars/UserNav";
 import {  SidebarProvider } from "@/components/ui/sidebar";
 import { FaProjectDiagram,FaTasks,FaFolderOpen ,FaCheckSquare,FaBell,FaCloud,FaUserAlt,FaChartBar,FaUserCog, FaHome  } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 
 
 export default function StudentDashboard() {
+  const currentUser = useSelector(state => state.auth.user);
+  console.log(currentUser);
+  const formattedSemester = currentUser?.semester.replace(/\s+/g, "-") || "";
 
   const navItems = [
     {
@@ -18,7 +22,7 @@ export default function StudentDashboard() {
     {
       id:2,
       title: "Project Overview",
-      url: "projectDetails",
+      url: `projects/${formattedSemester}/${currentUser?.projectId}`,
       icon: FaProjectDiagram,
     },
     {

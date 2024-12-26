@@ -116,8 +116,8 @@ const router = createBrowserRouter([
         element:<ProjectList/>
       },
       {
-        path:"projects/:semester/:projectId",
-        element:<ProjectDetails/>
+        path: "projects/:semester/:projectId",
+        element: <ProjectDetails />,
       },
       {
         path: "profile",
@@ -134,7 +134,7 @@ const router = createBrowserRouter([
         element: <StudentContent />,
       },
       {
-        path: "projectDetails",
+        path: "projects/:semester/:projectId",
         element: <ProjectDetails />,
       },
       {
