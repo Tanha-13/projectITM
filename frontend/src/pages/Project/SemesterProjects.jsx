@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import ProjectList from "./ProjectList";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Pagination,
   PaginationContent,
@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { setTotalCounts } from "../../redux/slice/supervisorSlice";
 
 function SemesterProjects() {
   const [projects, setProjects] = useState([]);
@@ -38,12 +39,12 @@ function SemesterProjects() {
   const [isLoading, setIsLoading] = useState(true);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
-  
 
   const { userId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const currentUser = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -66,8 +67,6 @@ function SemesterProjects() {
         }
         const data = await response.json();
         setProjects(data);
-
-
       } catch (error) {
         console.error("Error fetching projects:", error);
         // Handle error (e.g., show error message to user)
@@ -89,12 +88,14 @@ function SemesterProjects() {
           batch: project.student.batch,
           projectCounts: {},
           projects: [],
+          studentCount: 0,
         };
       }
 
       acc[key].projectCounts[projectType] =
         (acc[key].projectCounts[projectType] || 0) + 1;
       acc[key].projects.push(project);
+      acc[key].studentCount += 1;
       return acc;
     }, {});
 
@@ -110,10 +111,21 @@ function SemesterProjects() {
       const batchB = parseInt(b.batch.match(/\d+/)?.[0] || "0", 10);
       return batchA - batchB;
     });
-
     setSemesters(groupedData);
     setFilteredSemesters(groupedData);
-  }, [projects]);
+
+    const totalCounts = groupedData.reduce(
+      (acc, semester) => {
+        acc.studentCount += semester.studentCount;
+        acc.projectCount += semester.projectTypeCounts.Project || 0;
+        acc.thesisCount += semester.projectTypeCounts.Thesis || 0;
+        return acc;
+      },
+      { studentCount: 0, projectCount: 0, thesisCount: 0 }
+    );
+
+    dispatch(setTotalCounts(totalCounts));
+  }, [projects, dispatch]);
   console.log(semesters);
 
   useEffect(() => {

@@ -3,8 +3,10 @@ import students from "../../assets/icons/students.png";
 import projects from "../../assets/icons/projects.png";
 import theses from "../../assets/icons/thesis.png";
 import feedback from "../../assets/icons/feedback.png";
+import {PropTypes} from "prop-types"
 
-function InfoCardSupervisor() {
+function InfoCardSupervisor({infoCard}) {
+  console.log();
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
       <div>
@@ -18,7 +20,7 @@ function InfoCardSupervisor() {
               Total Students
             </CardTitle>
             <CardContent className="text-2xl text-third font-bold">
-              2000
+              {infoCard?.students?.length}
             </CardContent>
           </div>
         </Card>
@@ -76,3 +78,7 @@ function InfoCardSupervisor() {
 }
 
 export default InfoCardSupervisor;
+
+InfoCardSupervisor.propTypes = {
+  infoCard: PropTypes.obj
+}

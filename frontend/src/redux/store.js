@@ -3,6 +3,7 @@ import authReducer from "./slice/authSlice";
 import { persistReducer, persistStore } from "redux-persist";
 import { configureStore } from "@reduxjs/toolkit";
 import projectReducer from "./slice/projectSlice";
+import supervisorReducer from "./slice/supervisorSlice";
 
 const persistConfig = {
   key: "root",
@@ -16,6 +17,8 @@ const store = configureStore({
   reducer: {
     auth: persistedReducer,
     projects: projectReducer,
+    supervisor: supervisorReducer,
+
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
