@@ -41,6 +41,7 @@ import Swal from "sweetalert2";
 import { Textarea } from "@/components/ui/textarea";
 import { setCurrentProject } from "@/redux/slice/projectSlice";
 
+
 function ProjectList() {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
@@ -65,19 +66,21 @@ function ProjectList() {
       setFilteredProjects(semesterData.projects);
     }
   }, [semesterData]);
+  console.log(projects[0])
 
   useEffect(() => {
     const filtered = projects.filter(
       (project) =>
         (project.name.toLowerCase().includes(search.toLowerCase()) ||
-          project.description.toLowerCase().includes(search.toLowerCase()) ||
-          project.student.studentId.includes(search)) &&
+          project.title.toLowerCase().includes(search.toLowerCase()) ||
+          project.student.studentId.includes(search) || 
+          project.student.email.toLowerCase().includes(search.toLowerCase())) 
+          &&
         (filterType === "all" || project.projectType === filterType) &&
         (filterStatus === "all" || project.status === filterStatus)
     );
     setFilteredProjects(filtered);
-    setCurrentPage(1);
-  }, [search, filterType, filterStatus, projects]);
+  }, [projects, search, filterType, filterStatus]);
 
   const indexOfLastProject = currentPage * projectsPerPage;
   const indexOfFirstProject = indexOfLastProject - projectsPerPage;
@@ -120,7 +123,7 @@ function ProjectList() {
 
       if (result.isConfirmed) {
         const response = await fetch(
-          `http://localhost:3000/supervisor/${currentUser.id}/projects/${projectId}`,
+          `http://localhost:3000/api/supervisor/${currentUser.id}/projects/${projectId}`,
           {
             method: "DELETE",
           }
@@ -150,8 +153,19 @@ function ProjectList() {
 
   const handleStatusChange = async (projectId, newStatus) => {
     try {
+      // Optimistically update the UI
+      const updatedProjects = projects.map(project =>
+        project._id === projectId ? { ...project, status: newStatus } : project
+      );
+      setProjects(updatedProjects);
+      setFilteredProjects(prevFilteredProjects =>
+        prevFilteredProjects.map(project =>
+          project._id === projectId ? { ...project, status: newStatus } : project
+        )
+      );
+
       const res = await fetch(
-        `http://localhost:3000/supervisor/${currentUser.id}/projects/${projectId}`,
+        `http://localhost:3000/api/supervisor/${currentUser.id}/projects/${projectId}`,
         {
           method: "PATCH",
           headers: {
@@ -163,17 +177,23 @@ function ProjectList() {
       if (!res.ok) {
         throw new Error("Failed to update project status");
       }
-      const data = await res.json();
-      console.log(data);
-      setProjects(
-        projects.map((project) =>
-          project._id === projectId
-            ? { ...project, status: newStatus }
-            : project
-        )
-      );
+      const updatedProject = await res.json();
+      console.log("Updated project:", updatedProject);
+
+      Swal.fire({
+        title: "Success",
+        text: "Project status updated successfully",
+        icon: "success",
+      });
     } catch (error) {
       console.error("Error updating project status:", error);
+      // Revert the changes if the API call fails
+      setProjects(prevProjects => prevProjects.map(project =>
+        project._id === projectId ? { ...project, status: project.status } : project
+      ));
+      setFilteredProjects(prevFilteredProjects => prevFilteredProjects.map(project =>
+        project._id === projectId ? { ...project, status: project.status } : project
+      ));
       Swal.fire({
         title: "Error",
         text: "Failed to update project status",
@@ -540,3 +560,4 @@ function ProjectList() {
 }
 
 export default ProjectList;
+

@@ -10,6 +10,10 @@ import { useSelector } from "react-redux";
 import { FaEdit } from "react-icons/fa";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import PdfFormat from "@/components/PdfFormat";
+
 
 function ProjectDetails() {
   const [loading, setLoading] = useState(false);
@@ -23,7 +27,8 @@ function ProjectDetails() {
   const [projectTitle, setProjectTitle] = useState("");
   const [projectOverview, setProjectOverview] = useState("");
   const [functionalRequirements, setFunctionalRequirements] = useState("");
-  const [nonFunctionalRequirements, setNonFunctionalRequirements] = useState("");
+  const [nonFunctionalRequirements, setNonFunctionalRequirements] =
+    useState("");
   const [completedSections, setCompletedSections] = useState({
     projectTitle: false,
     projectOverview: false,
@@ -32,8 +37,8 @@ function ProjectDetails() {
     useCaseDiagram: false,
     entityRelationDiagram: false,
     documentation: false,
-
   });
+  const [showPDFPreview, setShowPDFPreview] = useState(false);
 
   const currentUser = useSelector((state) => state.auth.user);
   const { projectId } = useParams();
@@ -57,14 +62,18 @@ function ProjectDetails() {
         setCompletedSections(
           data.completedSections || {
             projectTitle: false,
-          projectOverview: false,
-          functionalRequirements: false,
-          nonFunctionalRequirements: false,
+            projectOverview: false,
+            functionalRequirements: false,
+            nonFunctionalRequirements: false,
             useCaseDiagram: false,
             entityRelationDiagram: false,
             documentation: false,
           }
         );
+        setProjectTitle(data.title || "");
+        setProjectOverview(data.overview || "");
+        setFunctionalRequirements(data.functionalRequirements || "");
+        setNonFunctionalRequirements(data.nonFunctionalRequirements || "");
       } catch (error) {
         console.log(error);
         Swal.fire({
@@ -103,10 +112,15 @@ function ProjectDetails() {
         });
         return;
       }
-      setFile({
-        file: file,
-        preview: URL.createObjectURL(file),
-      });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFile({
+          file: file,
+          preview: reader.result,
+        });
+      };
+      reader.readAsDataURL(file);
+
     }
   };
 
@@ -125,17 +139,25 @@ function ProjectDetails() {
         formData.append("documentation", documentation.file);
       formData.append("feedback", feedback);
       formData.append("completedSections", JSON.stringify(completedSections));
+      formData.append("title", projectTitle);
+      formData.append("overview", projectOverview);
+      formData.append("functionalRequirements", functionalRequirements);
+      formData.append("nonFunctionalRequirements", nonFunctionalRequirements);
 
-      const response = await fetch(``, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/projects/${projectId}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Error saving project data");
       }
 
       const updatedProject = await response.json();
+      setProject(updatedProject);
       setUseCaseDiagram(updatedProject.useCaseDiagram);
       setEntityRelationDiagram(updatedProject.entityRelationDiagram);
       setDocumentation(updatedProject.documentation);
@@ -145,6 +167,10 @@ function ProjectDetails() {
       ]);
       setFeedback("");
       setCompletedSections(updatedProject.completedSections);
+      setProjectTitle(updatedProject.title);
+      setProjectOverview(updatedProject.overview);
+      setFunctionalRequirements(updatedProject.functionalRequirements);
+      setNonFunctionalRequirements(updatedProject.nonFunctionalRequirements);
 
       Swal.fire({
         position: "center",
@@ -180,66 +206,107 @@ function ProjectDetails() {
   };
 
   const handleMarkAsComplete = (section) => {
-    setCompletedSections((prev) => ({
+    setCompletedSections(prev => ({
       ...prev,
       [section]: !prev[section],
     }));
   };
+
   const calculateProgress = () => {
     const totalSections = Object.keys(completedSections).length;
-    const completedCount =
-      Object.values(completedSections).filter(Boolean).length;
+    const completedCount = Object.values(completedSections).filter(Boolean).length;
     return (completedCount / totalSections) * 100;
   };
 
   const formatDate = (dateString) => {
-  const date = new Date(dateString);
+    const date = new Date(dateString);
 
-  const monthNames = ["January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
 
-  const month = monthNames[date.getUTCMonth()];
-  const day = date.getUTCDate();
-  const year = date.getUTCFullYear();
+    const month = monthNames[date.getUTCMonth()];
+    const day = date.getUTCDate();
+    const year = date.getUTCFullYear();
 
-  const getOrdinalSuffix = (day) => {
-    if (day > 3 && day < 21) return "th"; // For 11th to 19th
-    switch (day % 10) {
-      case 1: return "st";
-      case 2: return "nd";
-      case 3: return "rd";
-      default: return "th";
-    }
+    const getOrdinalSuffix = (day) => {
+      if (day > 3 && day < 21) return "th"; // For 11th to 19th
+      switch (day % 10) {
+        case 1:
+          return "st";
+        case 2:
+          return "nd";
+        case 3:
+          return "rd";
+        default:
+          return "th";
+      }
+    };
+
+    const dayWithSuffix = `${day}${getOrdinalSuffix(day)}`;
+
+    return `${month} ${dayWithSuffix}, ${year}`;
   };
 
-  const dayWithSuffix = `${day}${getOrdinalSuffix(day)}`;
-
-  return `${month} ${dayWithSuffix}, ${year}`;
-};
 
   return (
     <div className="bg-gray-50 min-h-screen md:p-10">
-      <Card className="p-2 rounded-none md:p-6">
+      <Card className="p-2 rounded-sm md:p-6">
         <div className="">
-        <div className="flex justify-end">
-        <Button>{`Export ${project.projectType === "Project" ? "Project" : "Thesis"}`}</Button>
-        </div>
-          <div className="mb-6 mt-4 text-center">
-            <h1 className="text-4xl font-bold">{project.name}</h1>
-            <h2 className="text-2xl font-bold mt-2">{project.title}</h2>
+          <div className="flex justify-end gap-2">
+            <Button onClick={() => setShowPDFPreview(true)}>Preview PDF</Button>
+            <PDFDownloadLink
+              document={
+                <PdfFormat 
+                  project={{
+                    ...project,
+                    useCaseDiagram,
+                    entityRelationDiagram,
+                    documentation,
+                    title: projectTitle,
+                    overview: projectOverview,
+                    functionalRequirements,
+                    nonFunctionalRequirements,
+                  }} 
+                />
+              }
+              fileName={`${currentUser.name}-${currentUser.studentId}.pdf`}
+            >
+              {({ blob, url, loading, error }) => (
+                <Button disabled={loading}>
+                  {loading ? 'Generating PDF...' : `Export ${project.projectType === "Project" ? "Project" : "Thesis"}`}
+                </Button>
+              )}
+            </PDFDownloadLink>
           </div>
-          <div className="flex flex-col md:flex-row gap-3 md:gap-10">
-            <Card className="grid gap-2 p-3 rounded-md max-h-48 min-h-44">
+          <div className="my-6 text-center">
+            <h1 className="text-2xl md:text-4xl font-bold">{project.name}</h1>
+            <h2 className="text-xl md:text-2xl font-bold mt-2">{projectTitle}</h2>
+          </div>
+          <div className="flex flex-col lg:flex-row gap-3 md:gap-10">
+            <Card className="grid gap-2 p-3 rounded-md md:h-60">
               <div className="grid grid-cols-2 items-center gap-2">
                 <h3>Project Status</h3>
-                <Badge className={`rounded-full font-medium text-base w-1/2 ${
-                        project.status === "Not started"
-                          ? "bg-gray-100 hover:bg-gray-200 text-gray-800 "
-                          : project.status === "In progress"
-                          ? "bg-blue-100 hover:bg-blue-200 text-blue-800"
-                          : "bg-green-100 hover:bg-green-200 text-green-800"
-                      }`}>
+                <Badge
+                  className={`rounded-full font-medium text-sm xl:w-1/2 ${
+                    project.status === "Not started"
+                      ? "bg-gray-100 hover:bg-gray-200 text-gray-800 "
+                      : project.status === "In progress"
+                      ? "bg-blue-100 hover:bg-blue-200 text-blue-800"
+                      : "bg-green-100 hover:bg-green-200 text-green-800"
+                  }`}
+                >
                   <div className="flex items-center gap-2">
                     <div
                       className={`w-2 h-2 rounded-full ${
@@ -268,10 +335,12 @@ function ProjectDetails() {
               </div>
               <div className="grid grid-cols-2 items-center gap-4">
                 <h3>Project Type</h3>
-                <span className="border w-1/4 rounded-full ps-3 bg-primary text-white font-medium">{project.projectType}</span>
+                <span className="border lg:w-1/2 xl:w-1/4 rounded-full ps-3 bg-primary text-white font-medium">
+                  {project.projectType}
+                </span>
               </div>
             </Card>
-            <Card className="mb-6 rounded-md min-h-48">
+            <Card className="mb-6 rounded-md md:h-60">
               <CardContent className="p-6 ">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-semibold">Project Progress</h3>
@@ -279,221 +348,305 @@ function ProjectDetails() {
                     {Math.round(calculateProgress())}%
                   </span>
                 </div>
+                <p className="my-3">Project completion rate based on student work</p>
                 <Progress value={calculateProgress()} className="w-full" />
               </CardContent>
             </Card>
           </div>
 
-          <Card className="mb-6 max-w-5xl mx-auto">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">Use Case Diagram</h3>
-                <Button
-                  variant={
-                    completedSections.useCaseDiagram ? "outline" : "link"
-                  }
-                  onClick={() => handleMarkAsComplete("useCaseDiagram")}
-                  className={
-                    completedSections.useCaseDiagram
-                      ? "text-white"
-                      : "underline"
-                  }
-                >
-                  {completedSections.useCaseDiagram ? (
-                    <>
-                      <FaCheck className="mr-2" /> Completed
-                    </>
-                  ) : (
-                    "Mark as Complete"
-                  )}
-                </Button>
-              </div>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
+          <Card className="rounded-md bg-gray-50 mt-5 p-1 md:p-5">
+            <h1 className="font-semibold text-xl md:text-2xl ">Project Completion Work</h1>
+            <Separator className="mb-10"/>
+            <Card className="mb-6 max-w-5xl mx-auto">
+              <CardContent className="p-2 md:p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-base md:text-xl font-semibold">Project Title</h3>
+                  <Button
+                    variant={completedSections.projectTitle ? "outline" : "link"}
+                    onClick={() => handleMarkAsComplete("projectTitle")}
+                    className={completedSections.projectTitle ? "text-white" : "underline"}
+                  >
+                    {completedSections.projectTitle ? (
+                      <>
+                        <FaCheck className="" /> Completed
+                      </>
+                    ) : (
+                      "Mark as Complete"
+                    )}
+                  </Button>
+                </div>
                 <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleFileChange(e, setUseCaseDiagram, 1024 * 1024)
-                  }
-                  className="hidden"
-                  id="use-case-upload"
+                  value={projectTitle}
+                  onChange={(e) => setProjectTitle(e.target.value)}
+                  placeholder="Enter project title"
                 />
-                <label htmlFor="use-case-upload" className="cursor-pointer">
-                  <FaUpload className="mx-auto mb-2" size={24} />
-                  <p>Choose Use Case Diagram to upload (Max 1MB)</p>
-                </label>
-              </div>
-              {useCaseDiagram && (
-                <div className="mt-4">
-                  <img
-                    src={
-                      useCaseDiagram.preview ||
-                      `http://localhost:3000/${useCaseDiagram.path}`
-                    }
-                    alt="Use Case Diagram"
-                    className="max-w-full h-auto rounded-lg shadow-md"
+              </CardContent>
+            </Card>
+
+            <Card className="mb-6 max-w-5xl mx-auto">
+              <CardContent className="p-2 md:p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-base md:text-xl font-semibold">Project Overview</h3>
+                  <Button
+                    variant={completedSections.projectOverview ? "outline" : "link"}
+                    onClick={() => handleMarkAsComplete("projectOverview")}
+                    className={completedSections.projectOverview ? "text-white" : "underline"}
+                  >
+                    {completedSections.projectOverview ? (
+                      <>
+                        <FaCheck className="mr-2" /> Completed
+                      </>
+                    ) : (
+                      "Mark as Complete"
+                    )}
+                  </Button>
+                </div>
+                <Textarea
+                  value={projectOverview}
+                  onChange={(e) => setProjectOverview(e.target.value)}
+                  placeholder="Enter project overview"
+                  rows={6}
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="mb-6 max-w-5xl mx-auto">
+              <CardContent className="p-2 md:p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-base md:text-xl font-semibold">Functional Requirements</h3>
+                  <Button
+                    variant={completedSections.functionalRequirements ? "outline" : "link"}
+                    onClick={() => handleMarkAsComplete("functionalRequirements")}
+                    className={completedSections.functionalRequirements ? "text-white" : "underline"}
+                  >
+                    {completedSections.functionalRequirements ? (
+                      <>
+                        <FaCheck className="mr-2" /> Completed
+                      </>
+                    ) : (
+                      "Mark as Complete"
+                    )}
+                  </Button>
+                </div>
+                <Textarea
+                  value={functionalRequirements}
+                  onChange={(e) => setFunctionalRequirements(e.target.value)}
+                  placeholder="Enter functional requirements"
+                  rows={15}
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="mb-6 max-w-5xl mx-auto">
+              <CardContent className="p-2 md:p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-base md:text-xl font-semibold">Non-Functional Requirements</h3>
+                  <Button
+                    variant={completedSections.nonFunctionalRequirements ? "outline" : "link"}
+                    onClick={() => handleMarkAsComplete("nonFunctionalRequirements")}
+                    className={completedSections.nonFunctionalRequirements ? "text-white" : "underline"}
+                  >
+                    {completedSections.nonFunctionalRequirements ? (
+                      <>
+                        <FaCheck className="mr-2" /> Completed
+                      </>
+                    ) : (
+                      "Mark as Complete"
+                    )}
+                  </Button>
+                </div>
+                <Textarea
+                  value={nonFunctionalRequirements}
+                  onChange={(e) => setNonFunctionalRequirements(e.target.value)}
+                  placeholder="Enter non-functional requirements"
+                  rows={10}
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="mb-6 max-w-5xl mx-auto">
+              <CardContent className="p-2 md:p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-base md:text-xl font-semibold">Use Case Diagram</h3>
+                  <Button
+                    variant={completedSections.useCaseDiagram ? "outline" : "link"}
+                    onClick={() => handleMarkAsComplete("useCaseDiagram")}
+                    className={completedSections.useCaseDiagram ? "text-white" : "underline"}
+                  >
+                    {completedSections.useCaseDiagram ? (
+                      <>
+                        <FaCheck className="mr-2" /> Completed
+                      </>
+                    ) : (
+                      "Mark as Complete"
+                    )}
+                  </Button>
+                </div>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, setUseCaseDiagram, 1024 * 1024)}
+                    className="hidden"
+                    id="use-case-upload"
                   />
+                  <label htmlFor="use-case-upload" className="cursor-pointer">
+                    <FaUpload className="mx-auto mb-2" size={24} />
+                    <p>Choose Use Case Diagram to upload (Max 1MB)</p>
+                  </label>
+                </div>
+                {useCaseDiagram && (
+                  <div className="mt-4">
+                    <img
+                      src={useCaseDiagram.preview || `http://localhost:3000/${useCaseDiagram.path}`}
+                      alt="Use Case Diagram"
+                      className="max-w-full h-auto rounded-lg shadow-md"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemoveFile(setUseCaseDiagram)}
+                      className="mt-2"
+                    >
+                      <FaTrash className="mr-2" /> Remove
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="mb-6 max-w-5xl mx-auto">
+              <CardContent className="p-2 md:p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-base md:text-xl font-semibold">Entity Relation Diagram</h3>
                   <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleRemoveFile(setUseCaseDiagram)}
-                    className="mt-2"
+                    variant={completedSections.entityRelationDiagram ? "outline" : "link"}
+                    onClick={() => handleMarkAsComplete("entityRelationDiagram")}
+                    className={completedSections.entityRelationDiagram ? "text-white" : "underline"}
                   >
-                    <FaTrash className="mr-2" /> Remove
+                    {completedSections.entityRelationDiagram ? (
+                      <>
+                        <FaCheck className="mr-2" /> Completed
+                      </>
+                    ) : (
+                      "Mark as Complete"
+                    )}
                   </Button>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="mb-6 max-w-5xl mx-auto">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">
-                  Entity Relation Diagram
-                </h3>
-                <Button
-                  variant={
-                    completedSections.entityRelationDiagram ? "outline" : "link"
-                  }
-                  onClick={() => handleMarkAsComplete("entityRelationDiagram")}
-                  className={
-                    completedSections.entityRelationDiagram
-                      ? "text-white"
-                      : "underline"
-                  }
-                >
-                  {completedSections.entityRelationDiagram ? (
-                    <>
-                      <FaCheck className="mr-2" /> Completed
-                    </>
-                  ) : (
-                    "Mark as Complete"
-                  )}
-                </Button>
-              </div>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleFileChange(e, setEntityRelationDiagram, 1024 * 1024)
-                  }
-                  className="hidden"
-                  id="er-diagram-upload"
-                />
-                <label htmlFor="er-diagram-upload" className="cursor-pointer">
-                  <FaUpload className="mx-auto mb-2" size={24} />
-                  <p>Choose Entity Relation Diagram to upload (Max 1MB)</p>
-                </label>
-              </div>
-              {entityRelationDiagram && (
-                <div className="mt-4">
-                  <img
-                    src={
-                      entityRelationDiagram.preview ||
-                      `http://localhost:3000/${entityRelationDiagram.path}`
-                    }
-                    alt="Entity Relation Diagram"
-                    className="max-w-full h-auto rounded-lg shadow-md"
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, setEntityRelationDiagram, 1024 * 1024)}
+                    className="hidden"
+                    id="er-diagram-upload"
                   />
+                  <label htmlFor="er-diagram-upload" className="cursor-pointer">
+                    <FaUpload className="mx-auto mb-2" size={24} />
+                    <p>Choose Entity Relation Diagram to upload (Max 1MB)</p>
+                  </label>
+                </div>
+                {entityRelationDiagram && (
+                  <div className="mt-4">
+                    <img
+                      src={entityRelationDiagram.preview || `http://localhost:3000/${entityRelationDiagram.path}`}
+                      alt="Entity Relation Diagram"
+                      className="max-w-full h-auto rounded-lg shadow-md"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemoveFile(setEntityRelationDiagram)}
+                      className="mt-2"
+                    >
+                      <FaTrash className="mr-2" /> Remove
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="mb-6 max-w-5xl mx-auto">
+              <CardContent className="p-2 md:p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-base md:text-xl font-semibold">Documentation</h3>
                   <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleRemoveFile(setEntityRelationDiagram)}
-                    className="mt-2"
+                    variant={completedSections.documentation ? "outline" : "link"}
+                    onClick={() => handleMarkAsComplete("documentation")}
+                    className={completedSections.documentation ? "text-white" : "underline"}
                   >
-                    <FaTrash className="mr-2" /> Remove
+                    {completedSections.documentation ? (
+                      <>
+                        <FaCheck className="mr-2" /> Completed
+                      </>
+                    ) : (
+                      "Mark as Complete"
+                    )}
                   </Button>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="mb-6 max-w-5xl mx-auto">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">Documentation</h3>
-                <Button
-                  variant={completedSections.documentation ? "outline" : "link"}
-                  onClick={() => handleMarkAsComplete("documentation")}
-                  className={
-                    completedSections.documentation ? "text-white" : "underline"
-                  }
-                >
-                  {completedSections.documentation ? (
-                    <>
-                      <FaCheck className="mr-2" /> Completed
-                    </>
-                  ) : (
-                    "Mark as Complete"
-                  )}
-                </Button>
-              </div>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
-                <Input
-                  type="file"
-                  onChange={(e) =>
-                    handleFileChange(e, setDocumentation, 2 * 1024 * 1024)
-                  }
-                  className="hidden"
-                  id="documentation-upload"
-                />
-                <label
-                  htmlFor="documentation-upload"
-                  className="cursor-pointer"
-                >
-                  <FaUpload className="mx-auto mb-2" size={24} />
-                  <p>Choose Documentation to upload (Max 2MB)</p>
-                </label>
-              </div>
-              {documentation && (
-                <div className="mt-4">
-                  <p>
-                    {documentation.file
-                      ? documentation.file.name
-                      : documentation.filename}
-                  </p>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleRemoveFile(setDocumentation)}
-                    className="mt-2"
-                  >
-                    <FaTrash className="mr-2" /> Remove
-                  </Button>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
+                  <Input
+                    type="file"
+                    onChange={(e) => handleFileChange(e, setDocumentation, 2 * 1024 * 1024)}
+                    className="hidden"
+                    id="documentation-upload"
+                  />
+                  <label htmlFor="documentation-upload" className="cursor-pointer">
+                    <FaUpload className="mx-auto mb-2" size={24} />
+                    <p>Choose Documentation to upload (Max 2MB)</p>
+                  </label>
                 </div>
-              )}
-            </CardContent>
+                {documentation && (
+                  <div className="mt-4">
+                    <p>{documentation.file ? documentation.file.name : documentation.filename}</p>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemoveFile(setDocumentation)}
+                      className="mt-2"
+                    >
+                      <FaTrash className="mr-2" /> Remove
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            <div className="flex justify-center space-x-4">
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setUseCaseDiagram(project.useCaseDiagram);
+                  setEntityRelationDiagram(project.entityRelationDiagram);
+                  setDocumentation(project.documentation);
+                  setFeedback("");
+                  setProjectTitle(project.title);
+                  setProjectOverview(project.overview);
+                  setFunctionalRequirements(project.functionalRequirements);
+                  setNonFunctionalRequirements(project.nonFunctionalRequirements);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={
+                  !projectTitle &&
+                  !projectOverview &&
+                  !functionalRequirements &&
+                  !nonFunctionalRequirements &&
+                  !useCaseDiagram &&
+                  !entityRelationDiagram &&
+                  !documentation &&
+                  feedback.trim() === ""
+                }
+              >
+                Save All Changes
+              </Button>
+            </div>
           </Card>
-          <div className="flex justify-center space-x-4">
-            <Button
-              variant="destructive"
-              onClick={() => {
-                setUseCaseDiagram(project.useCaseDiagram);
-                setEntityRelationDiagram(project.entityRelationDiagram);
-                setDocumentation(project.documentation);
-                setFeedback("");
-                // setCompletedSections(project.completedSections);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={
-                !useCaseDiagram &&
-                !entityRelationDiagram &&
-                !documentation &&
-                feedback.trim() === ""
-              }
-            >
-              Save All Changes
-            </Button>
-          </div>
 
-          <Card className="mb-6 mt-6 max-w-5xl mx-auto">
-            <CardContent className="p-6">
+          <div className="mb-6 mt-6 max-w-5xl mx-auto">
+            <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold">Feedback</h3>
               </div>
@@ -550,11 +703,36 @@ function ProjectDetails() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </Card>
+      {showPDFPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg w-11/12 h-5/6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">PDF Preview</h2>
+              <Button onClick={() => setShowPDFPreview(false)}>Close</Button>
+            </div>
+            <PDFViewer width="100%" height="90%">
+              <PdfFormat 
+                project={{
+                  ...project,
+                  useCaseDiagram,
+                  entityRelationDiagram,
+                  documentation,
+                  title: projectTitle,
+                  overview: projectOverview,
+                  functionalRequirements,
+                  nonFunctionalRequirements,
+                }}
+              />
+            </PDFViewer>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 }
 

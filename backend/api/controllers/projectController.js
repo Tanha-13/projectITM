@@ -35,6 +35,7 @@ const getProject = async (req, res, next) => {
   }
 };
 
+
 // exports.updateProject = async (req, res, next) => {
 //   try {
 //     await connectToProjectDB();

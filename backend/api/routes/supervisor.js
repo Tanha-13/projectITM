@@ -11,7 +11,9 @@ router.get("/:id/students",getStudents);
 // getting project details
 router.post("/:id/create-project",getProjectDetails);
 router.get("/:id/semester-projects", semesterProjects);
+// handle project summary update
 router.put("/:id/projects/:projectId", updateProjects);
 router.delete("/:id/projects/:projectId", deleteProjects);
+//status change
 router.patch("/:id/projects/:projectId", updateStatusProjects);
 module.exports = router;

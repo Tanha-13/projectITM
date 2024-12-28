@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { setTotalCounts } from "../../redux/slice/supervisorSlice";
+import { totalSemesters } from "@/redux/slice/supervisorSlice";
 
 function SemesterProjects() {
   const [projects, setProjects] = useState([]);
@@ -88,7 +88,6 @@ function SemesterProjects() {
           batch: project.student.batch,
           projectCounts: {},
           projects: [],
-          studentCount: 0,
         };
       }
 
@@ -113,20 +112,8 @@ function SemesterProjects() {
     });
     setSemesters(groupedData);
     setFilteredSemesters(groupedData);
-
-    const totalCounts = groupedData.reduce(
-      (acc, semester) => {
-        acc.studentCount += semester.studentCount;
-        acc.projectCount += semester.projectTypeCounts.Project || 0;
-        acc.thesisCount += semester.projectTypeCounts.Thesis || 0;
-        return acc;
-      },
-      { studentCount: 0, projectCount: 0, thesisCount: 0 }
-    );
-
-    dispatch(setTotalCounts(totalCounts));
-  }, [projects, dispatch]);
-  console.log(semesters);
+    dispatch(totalSemesters(groupedData));
+  }, [projects,dispatch]);
 
   useEffect(() => {
     const filtered = semesters.filter(

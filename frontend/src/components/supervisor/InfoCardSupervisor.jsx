@@ -6,7 +6,6 @@ import feedback from "../../assets/icons/feedback.png";
 import {PropTypes} from "prop-types"
 
 function InfoCardSupervisor({infoCard}) {
-  console.log();
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
       <div>
@@ -20,7 +19,7 @@ function InfoCardSupervisor({infoCard}) {
               Total Students
             </CardTitle>
             <CardContent className="text-2xl text-third font-bold">
-              {infoCard?.students?.length}
+              {infoCard?.students?.length || 0}
             </CardContent>
           </div>
         </Card>
@@ -36,7 +35,7 @@ function InfoCardSupervisor({infoCard}) {
               Total Projects
             </CardTitle>
             <CardContent className="text-2xl text-third font-bold">
-              200
+              1
             </CardContent>
           </div>
         </Card>
@@ -52,7 +51,7 @@ function InfoCardSupervisor({infoCard}) {
               Total Theses
             </CardTitle>
             <CardContent className="text-2xl text-third font-bold">
-              89
+              1
             </CardContent>
           </div>
         </Card>
@@ -68,7 +67,7 @@ function InfoCardSupervisor({infoCard}) {
               Pending Feedback
             </CardTitle>
             <CardContent className="text-2xl text-third font-bold">
-              56
+              0
             </CardContent>
           </div>
         </Card>

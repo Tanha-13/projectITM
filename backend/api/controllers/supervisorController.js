@@ -243,20 +243,18 @@ const deleteProjects = async (req, res, next) => {
   }
 };
 const updateStatusProjects = async (req, res, next) => {
-  const { id, projectId } = req.params;
-  console.log(id, projectId);
   try {
     await connectToProjectDB();
     const Project = getProjectModel();
     const { id, projectId } = req.params;
-    console.log(id, projectId);
     const { status } = req.body;
 
     const updatedProject = await Project.findByIdAndUpdate(
       projectId,
       { status },
-      { new: true }
+      { new: true, runValidators: true }
     );
+    console.log(updateProjects);
 
     if (!updatedProject) {
       return res.status(404).json({ message: "Project not found" });
@@ -334,10 +332,12 @@ const editSupervisorProfile = async (req, res, next) => {
   }
 };
 
+
 module.exports = {
   getStudents,
   getProjectDetails,
   semesterProjects,
+  
   updateProjects,
   deleteProjects,
   updateStatusProjects,
