@@ -1,4 +1,3 @@
-const { populate } = require("dotenv");
 const { connectToProjectDB, getProjectModel } = require("../config/projectDB");
 const {
   connectToUserDB,
@@ -35,58 +34,68 @@ const getProject = async (req, res, next) => {
   }
 };
 
+const updateProject = async (req, res, next) => {
+  console.log(req.body);
+  try {
+    await connectToProjectDB();
+    const Project = getProjectModel();
+    const {
+      title,
+      overview,
+      functionalRequirements,
+      nonFunctionalRequirements,
+      completedSections,
+      feedback,
+    } = req.body;
 
-// exports.updateProject = async (req, res, next) => {
-//   try {
-//     await connectToProjectDB();
-//     const Project = getProjectModel();
-//     const updatedProject = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
-//     if (!updatedProject) {
-//       return next(errorHandler(404, 'Project not found'));
-//     }
-//     res.status(200).json(updatedProject);
-//   } catch (error) {
-//     next(errorHandler(500, 'Error updating project'));
-//   }
-// };
+    const updateData = {
+      title,
+      overview,
+      functionalRequirements,
+      nonFunctionalRequirements,
+      completedSections: JSON.parse(completedSections),
+      $push: { feedbackList: { text: feedback, user: req.user.name } },
+    };
 
-// exports.deleteProject = async (req, res, next) => {
-//   try {
-//     await connectToProjectDB();
-//     await connectToUserDB();
-//     const Project = getProjectModel();
-//     const Student = getStudentModel();
-//     const Supervisor = getSupervisorModel();
+    if (req.files) {
+      if (req.files.useCaseDiagram) {
+        updateData.useCaseDiagram = {
+          filename: req.files.useCaseDiagram[0].filename,
+          path: req.files.useCaseDiagram[0].path,
+        };
+      }
+      if (req.files.entityRelationDiagram) {
+        updateData.entityRelationDiagram = {
+          filename: req.files.entityRelationDiagram[0].filename,
+          path: req.files.entityRelationDiagram[0].path,
+        };
+      }
+      if (req.files.documentation) {
+        updateData.documentation = {
+          filename: req.files.documentation[0].filename,
+          path: req.files.documentation[0].path,
+        };
+      }
+    }
 
-//     const project = await Project.findById(req.params.id);
-//     if (!project) {
-//       return next(errorHandler(404, 'Project not found'));
-//     }
+    const updatedProject = await Project.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
 
-//     await Student.findByIdAndUpdate(project.student, { $unset: { project: 1 } });
-//     await Supervisor.findByIdAndUpdate(project.supervisor, { $pull: { projects: project._id } });
+    if (!updatedProject) {
+      return next(errorHandler(404, 'Project not found'));
+    }
 
-//     await Project.findByIdAndDelete(req.params.id);
-//     res.status(200).json({ message: 'Project deleted successfully' });
-//   } catch (error) {
-//     next(errorHandler(500, 'Error deleting project'));
-//   }
-// };
+    res.status(200).json(updatedProject);
+  } catch (error) {
+    next(errorHandler(500, 'Error updating project'));
+  }
+};
 
-// exports.getAllProjects = async (req, res, next) => {
-//   try {
-//     await connectToProjectDB();
-//     const Project = getProjectModel();
-//     const projects = await Project.find()
-//       .populate('student', 'studentId')
-//       .populate('supervisor', 'user')
-//       .populate('tasks');
-//     res.status(200).json(projects);
-//   } catch (error) {
-//     next(errorHandler(500, 'Error getting all projects'));
-//   }
-// };
 
 module.exports = {
   getProject,
+  updateProject
 };

@@ -6,6 +6,9 @@ const projectSchema = new mongoose.Schema(
     name: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
+    overview: { type: String },
+    functionalRequirements: { type: String },
+    nonFunctionalRequirements: { type: String },
     semester: { type: String },
     year: { type: Number },
     status: {
@@ -27,9 +30,32 @@ const projectSchema = new mongoose.Schema(
       filename: String,
       path: String,
     },
-    feedback: String,
+    documentation: {
+      filename: String,
+      path: String,
+    },
+    completedSections: {
+      projectTitle: { type: Boolean, default: false },
+      projectOverview: { type: Boolean, default: false },
+      functionalRequirements: { type: Boolean, default: false },
+      nonFunctionalRequirements: { type: Boolean, default: false },
+      useCaseDiagram: { type: Boolean, default: false },
+      entityRelationDiagram: { type: Boolean, default: false },
+      documentation: { type: Boolean, default: false },
+    },
+    feedbackList: [{
+      text: String,
+      user: String,
+      createdAt: { type: Date, default: Date.now },
+      replies: [{
+        text: String,
+        user: String,
+        createdAt: { type: Date, default: Date.now },
+      }],
+    }],
   },
   { timestamps: true }
 );
 
 module.exports = projectSchema;
+

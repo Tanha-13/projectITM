@@ -1,23 +1,21 @@
+import React, { useState, useEffect } from 'react';
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 import { Card, CardContent } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { FaCheck, FaTrash, FaUpload } from "react-icons/fa6";
-import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { useSelector } from "react-redux";
-import { FaEdit } from "react-icons/fa";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
-import PdfFormat from "@/components/PdfFormat";
-
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { FaCheck, FaTrash, FaUpload, FaEdit } from "react-icons/fa";
+import Swal from 'sweetalert2';
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import PdfFormat from '@/components/PdfFormat';
 
 function ProjectDetails() {
-  const [loading, setLoading] = useState(false);
   const [project, setProject] = useState({});
+  const [loading, setLoading] = useState(true);
   const [useCaseDiagram, setUseCaseDiagram] = useState(null);
   const [entityRelationDiagram, setEntityRelationDiagram] = useState(null);
   const [documentation, setDocumentation] = useState(null);
@@ -27,8 +25,7 @@ function ProjectDetails() {
   const [projectTitle, setProjectTitle] = useState("");
   const [projectOverview, setProjectOverview] = useState("");
   const [functionalRequirements, setFunctionalRequirements] = useState("");
-  const [nonFunctionalRequirements, setNonFunctionalRequirements] =
-    useState("");
+  const [nonFunctionalRequirements, setNonFunctionalRequirements] = useState("");
   const [completedSections, setCompletedSections] = useState({
     projectTitle: false,
     projectOverview: false,
@@ -40,8 +37,137 @@ function ProjectDetails() {
   });
   const [showPDFPreview, setShowPDFPreview] = useState(false);
 
-  const currentUser = useSelector((state) => state.auth.user);
   const { projectId } = useParams();
+  const currentUser = useSelector((state) => state.auth.user);
+
+  const handleFileChange = (e, setFile, maxSize) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > maxSize) {
+        Swal.fire({
+          title: "Error",
+          text: `File size should not exceed ${maxSize / (1024 * 1024)} MB`,
+          icon: "error",
+        });
+        return;
+      }
+      if (setFile !== setDocumentation && !file.type.startsWith("image/")) {
+        Swal.fire({
+          title: "Error",
+          text: "Please upload an image file",
+          icon: "error",
+        });
+        return;
+      }
+      setFile({
+        file: file,
+        preview: URL.createObjectURL(file),
+      });
+    }
+  };
+
+  const handleRemoveFile = (setFile) => {
+    setFile((prev) => {
+      if (prev && prev.preview) {
+        URL.revokeObjectURL(prev.preview);
+      }
+      return null;
+    });
+  };
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      if (useCaseDiagram && useCaseDiagram.file)
+        formData.append("useCaseDiagram", useCaseDiagram.file);
+      if (entityRelationDiagram && entityRelationDiagram.file)
+        formData.append("entityRelationDiagram", entityRelationDiagram.file);
+      if (documentation && documentation.file)
+        formData.append("documentation", documentation.file);
+      formData.append("feedback", feedback);
+      formData.append("completedSections", JSON.stringify(completedSections));
+      formData.append("title", projectTitle);
+      formData.append("overview", projectOverview);
+      formData.append("functionalRequirements", functionalRequirements);
+      formData.append("nonFunctionalRequirements", nonFunctionalRequirements);
+
+      const response = await fetch(
+        `http://localhost:3000/api/projects/${projectId}`,
+        {
+          method: "PUT",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error saving project data");
+      }
+
+      const updatedProject = await response.json();
+      setProject(updatedProject);
+      setUseCaseDiagram(updatedProject.useCaseDiagram);
+      setEntityRelationDiagram(updatedProject.entityRelationDiagram);
+      setDocumentation(updatedProject.documentation);
+      setFeedbackList(updatedProject.feedbackList || []);
+      setCompletedSections(updatedProject.completedSections);
+      setProjectTitle(updatedProject.title);
+      setProjectOverview(updatedProject.overview);
+      setFunctionalRequirements(updatedProject.functionalRequirements);
+      setNonFunctionalRequirements(updatedProject.nonFunctionalRequirements);
+      setFeedback("");
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Project details have been saved',
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to save project details',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReply = (index) => {
+    const updatedFeedbackList = [...feedbackList];
+    updatedFeedbackList[index].replies = [
+      ...(updatedFeedbackList[index].replies || []),
+      { text: replyText, user: currentUser.name },
+    ];
+    setFeedbackList(updatedFeedbackList);
+    setReplyText("");
+  };
+
+  const handleModify = (index) => {
+    setFeedback(feedbackList[index].text);
+    const updatedFeedbackList = feedbackList.filter((_, i) => i !== index);
+    setFeedbackList(updatedFeedbackList);
+  };
+
+  const handleMarkAsComplete = (section) => {
+    setCompletedSections(prev => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  const calculateProgress = () => {
+    const totalSections = Object.keys(completedSections).length;
+    const completedCount = Object.values(completedSections).filter(Boolean).length;
+    return (completedCount / totalSections) * 100;
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+  };
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
@@ -87,178 +213,10 @@ function ProjectDetails() {
     };
     fetchProjectDetails();
   }, [projectId]);
-  console.log(project);
 
   if (loading) {
     return <div>Loading...</div>;
   }
-
-  const handleFileChange = (e, setFile, maxSize) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > maxSize) {
-        Swal.fire({
-          title: "Error",
-          text: `File size should not exceed ${maxSize / (1024 * 1024)} MB`,
-          icon: "error",
-        });
-        return;
-      }
-      if (setFile !== setDocumentation && !file.type.startsWith("image/")) {
-        Swal.fire({
-          title: "Error",
-          text: "Please upload an image file",
-          icon: "error",
-        });
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFile({
-          file: file,
-          preview: reader.result,
-        });
-      };
-      reader.readAsDataURL(file);
-
-    }
-  };
-
-  const handleRemoveFile = (setFile) => {
-    setFile(null);
-  };
-
-  const handleSave = async () => {
-    try {
-      const formData = new FormData();
-      if (useCaseDiagram && useCaseDiagram.file)
-        formData.append("useCaseDiagram", useCaseDiagram.file);
-      if (entityRelationDiagram && entityRelationDiagram.file)
-        formData.append("entityRelationDiagram", entityRelationDiagram.file);
-      if (documentation && documentation.file)
-        formData.append("documentation", documentation.file);
-      formData.append("feedback", feedback);
-      formData.append("completedSections", JSON.stringify(completedSections));
-      formData.append("title", projectTitle);
-      formData.append("overview", projectOverview);
-      formData.append("functionalRequirements", functionalRequirements);
-      formData.append("nonFunctionalRequirements", nonFunctionalRequirements);
-
-      const response = await fetch(
-        `http://localhost:3000/api/projects/${projectId}`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error saving project data");
-      }
-
-      const updatedProject = await response.json();
-      setProject(updatedProject);
-      setUseCaseDiagram(updatedProject.useCaseDiagram);
-      setEntityRelationDiagram(updatedProject.entityRelationDiagram);
-      setDocumentation(updatedProject.documentation);
-      setFeedbackList([
-        ...feedbackList,
-        { text: feedback, user: currentUser.name },
-      ]);
-      setFeedback("");
-      setCompletedSections(updatedProject.completedSections);
-      setProjectTitle(updatedProject.title);
-      setProjectOverview(updatedProject.overview);
-      setFunctionalRequirements(updatedProject.functionalRequirements);
-      setNonFunctionalRequirements(updatedProject.nonFunctionalRequirements);
-
-      Swal.fire({
-        position: "center",
-        icon: "success",
-        title: "Project details have been saved",
-        showConfirmButton: true,
-        timer: 1500,
-      });
-    } catch (err) {
-      console.log(err);
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: `${err}`,
-      });
-    }
-  };
-
-  const handleReply = (index) => {
-    const updatedFeedbackList = [...feedbackList];
-    updatedFeedbackList[index].replies = [
-      ...(updatedFeedbackList[index].replies || []),
-      { text: replyText, user: currentUser.name },
-    ];
-    setFeedbackList(updatedFeedbackList);
-    setReplyText("");
-  };
-
-  const handleModify = (index) => {
-    setFeedback(feedbackList[index].text);
-    const updatedFeedbackList = feedbackList.filter((_, i) => i !== index);
-    setFeedbackList(updatedFeedbackList);
-  };
-
-  const handleMarkAsComplete = (section) => {
-    setCompletedSections(prev => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
-
-  const calculateProgress = () => {
-    const totalSections = Object.keys(completedSections).length;
-    const completedCount = Object.values(completedSections).filter(Boolean).length;
-    return (completedCount / totalSections) * 100;
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
-    const month = monthNames[date.getUTCMonth()];
-    const day = date.getUTCDate();
-    const year = date.getUTCFullYear();
-
-    const getOrdinalSuffix = (day) => {
-      if (day > 3 && day < 21) return "th"; // For 11th to 19th
-      switch (day % 10) {
-        case 1:
-          return "st";
-        case 2:
-          return "nd";
-        case 3:
-          return "rd";
-        default:
-          return "th";
-      }
-    };
-
-    const dayWithSuffix = `${day}${getOrdinalSuffix(day)}`;
-
-    return `${month} ${dayWithSuffix}, ${year}`;
-  };
-
 
   return (
     <div className="bg-gray-50 min-h-screen md:p-10">
@@ -279,6 +237,8 @@ function ProjectDetails() {
                     functionalRequirements,
                     nonFunctionalRequirements,
                   }} 
+                  studentName={currentUser.name} 
+                  studentId={currentUser.studentId} 
                 />
               }
               fileName={`${currentUser.name}-${currentUser.studentId}.pdf`}
@@ -498,7 +458,7 @@ function ProjectDetails() {
                 {useCaseDiagram && (
                   <div className="mt-4">
                     <img
-                      src={useCaseDiagram.preview || `http://localhost:3000/${useCaseDiagram.path}`}
+                      src={useCaseDiagram?.preview || `http://localhost:3000/${useCaseDiagram?.path}`}
                       alt="Use Case Diagram"
                       className="max-w-full h-auto rounded-lg shadow-md"
                     />
@@ -549,7 +509,7 @@ function ProjectDetails() {
                 {entityRelationDiagram && (
                   <div className="mt-4">
                     <img
-                      src={entityRelationDiagram.preview || `http://localhost:3000/${entityRelationDiagram.path}`}
+                      src={entityRelationDiagram?.preview || `http://localhost:3000/${entityRelationDiagram?.path}`}
                       alt="Entity Relation Diagram"
                       className="max-w-full h-auto rounded-lg shadow-md"
                     />
@@ -623,6 +583,7 @@ function ProjectDetails() {
                   setProjectOverview(project.overview);
                   setFunctionalRequirements(project.functionalRequirements);
                   setNonFunctionalRequirements(project.nonFunctionalRequirements);
+                  setCompletedSections(project.completedSections);
                 }}
               >
                 Cancel
@@ -630,13 +591,13 @@ function ProjectDetails() {
               <Button
                 onClick={handleSave}
                 disabled={
-                  !projectTitle &&
-                  !projectOverview &&
-                  !functionalRequirements &&
-                  !nonFunctionalRequirements &&
-                  !useCaseDiagram &&
-                  !entityRelationDiagram &&
-                  !documentation &&
+                  !projectTitle ||
+                  !projectOverview ||
+                  !functionalRequirements ||
+                  !nonFunctionalRequirements ||
+                  !useCaseDiagram ||
+                  !entityRelationDiagram ||
+                  !documentation ||
                   feedback.trim() === ""
                 }
               >
@@ -726,14 +687,16 @@ function ProjectDetails() {
                   functionalRequirements,
                   nonFunctionalRequirements,
                 }}
+                studentName={currentUser.name} 
+                studentId={currentUser.studentId} 
               />
             </PDFViewer>
           </div>
         </div>
       )}
     </div>
-
   );
 }
 
 export default ProjectDetails;
+

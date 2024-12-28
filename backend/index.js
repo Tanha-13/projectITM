@@ -3,12 +3,16 @@ const cors = require("cors");
 const { connectToUserDB } = require("./api/config/userDB");
 const { connectToProjectDB } = require("./api/config/projectDB");
 const seedAdmin = require("./api/seeds/seedAdmin");
+const path = require("path");
 
 const app = express();
 
 // middleware
 app.use(cors());
 app.use(express.json());
+
+
+const _dirname = path.resolve();
 
 //database connection
 const databaseConnection = async () => {
@@ -56,6 +60,10 @@ databaseConnection().then(() => {
   const projectRoutes = require("./api/routes/project");
   app.use("/api/projects",projectRoutes);
   
+  app.use(express.static(path.join(_dirname, "./frontend/dist")));
+  app.get('*',(req,res)=>{
+    res.sendFile(path.resolve(_dirname,"frontend","dist", "index.html"));
+  });
   // server
   const port = process.env.PORT || 5000;
   app.listen(port, () => {
