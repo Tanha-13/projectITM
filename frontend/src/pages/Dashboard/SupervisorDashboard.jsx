@@ -47,13 +47,13 @@ function SupervisorDashboard() {
     {
       id: 3,
       title: "Student",
-      url: "#",
+      url: "students/all",
       icon: FaUserGraduate,
       subItems: [
         {
           id: 3.1,
           title: "View",
-          url: "#",
+          url: "students/all",
           icon: FaMinus,
         },
       ],

@@ -20,6 +20,7 @@ import ProjectList from "@/pages/Project/ProjectList";
 import Projects from "@/pages/Project/SemesterProjects";
 import Register from "@/pages/Register/Register";
 import CreateProject from "@/pages/Supervisor/CreateProject";
+import TotalStudents from "@/pages/Supervisor/TotalStudents";
 import { createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([
@@ -118,6 +119,10 @@ const router = createBrowserRouter([
       {
         path: "projects/:semester/:projectId",
         element: <ProjectDetails />,
+      },
+      {
+        path: "students/all",
+        element: <TotalStudents />,
       },
       {
         path: "profile",

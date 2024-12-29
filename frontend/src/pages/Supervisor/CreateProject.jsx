@@ -207,7 +207,7 @@ function CreateProject() {
 
   return (
     <div className="p-2 md:p-10 min-h-screen bg-gray-50">
-      <Card className="p-10 max-w-7xl mx-auto w-full">
+      <Card className="p-2 md:p-10 max-w-7xl mx-auto w-full">
         <h1 className="text-3xl font-semibold md:text-4xl">
           Create {formData.projectType || "Project/Thesis"}
         </h1>

@@ -222,7 +222,7 @@ function SemesterProjects() {
                 </Card>
               ))}
             </div>
-            <div className="mt-4 flex justify-between items-center">
+            <div className="mt-4 flex flex-col md:flex-row justify-between items-center">
               <div className="flex items-center gap-5 mt-2 md:mt-0 mb-5 md:mb-0">
                 <Label htmlFor="items-per-page">Show Semester:</Label>
                 <Select

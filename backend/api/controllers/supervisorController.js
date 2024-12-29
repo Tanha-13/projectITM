@@ -1,4 +1,4 @@
-const { populate } = require("dotenv");
+
 const { connectToProjectDB, getProjectModel } = require("../config/projectDB");
 const {
   connectToUserDB,

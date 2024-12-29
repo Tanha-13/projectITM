@@ -1,123 +1,36 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { FaUserPen, FaTrash } from "react-icons/fa6";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import Swal from "sweetalert2";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useEffect, useState } from "react";
+import { FaTrash, FaUserPen } from "react-icons/fa6";
+import { useSelector } from "react-redux";
+import Swal from "sweetalert2";
 
-// const mockSupervisors = [
-//   {
-//     id: 1,
-//     name: "John Doe",
-//     email: "john@example.com",
-//     designation: "Senior Supervisor",
-//   },
-//   {
-//     id: 2,
-//     name: "Jane Smith",
-//     email: "jane@example.com",
-//     designation: "Team Lead",
-//   },
-//   {
-//     id: 3,
-//     name: "Bob Johnson",
-//     email: "bob@example.com",
-//     designation: "Department Manager",
-//   },
-//   {
-//     id: 4,
-//     name: "Alice Brown",
-//     email: "alice@example.com",
-//     designation: "Project Supervisor",
-//   },
-//   {
-//     id: 5,
-//     name: "Charlie Davis",
-//     email: "charlie@example.com",
-//     designation: "Assistant Manager",
-//   },
-//   {
-//     id: 6,
-//     name: "Eva Wilson",
-//     email: "eva@example.com",
-//     designation: "Senior Supervisor",
-//   },
-//   {
-//     id: 7,
-//     name: "Frank Miller",
-//     email: "frank@example.com",
-//     designation: "Team Lead",
-//   },
-//   {
-//     id: 8,
-//     name: "Grace Lee",
-//     email: "grace@example.com",
-//     designation: "Department Manager",
-//   },
-//   {
-//     id: 9,
-//     name: "Henry Taylor",
-//     email: "henry@example.com",
-//     designation: "Project Supervisor",
-//   },
-//   {
-//     id: 10,
-//     name: "Ivy Chen",
-//     email: "ivy@example.com",
-//     designation: "Assistant Manager",
-//   },
-// ];
-
-function StudentsAdmin() {
+function TotalStudents() {
   const [students, setStudents] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [studentPerPage, setStudentPerPage] = useState(5);
   const [editingStudent, setEditingStudent] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  // console.log(editingStudent);
+
+  const currentUser = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    fetchAllStudents();
-  }, []);
 
-  const fetchAllStudents = async () => {
+    studentsPerSupervisor();
+  }, [currentUser.id]);
+
+  const studentsPerSupervisor = async () => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/admin/all-students"
+        `http://localhost:3000/api/supervisor/${currentUser.id}/students`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch supervisors");
@@ -126,10 +39,10 @@ function StudentsAdmin() {
       console.log(data);
       setStudents(data);
     } catch (error) {
-      console.error("Error fetching supervisors:", error);
+      console.log(error);
     }
   };
-  console.log(students);
+
   const filteredStudents = students.filter(
     (student) =>
       student.user.firstName.toLowerCase().includes(search.toLowerCase()) ||
@@ -139,85 +52,16 @@ function StudentsAdmin() {
       student.studentId.includes(search) ||
       student.semester.toLowerCase().includes(search.toLowerCase())
   );
-
   const lastItem = currentPage * studentPerPage;
   const firstItem = lastItem - studentPerPage;
   const totalPages = Math.ceil(filteredStudents.length / studentPerPage);
   const currentStudents = filteredStudents.slice(firstItem, lastItem);
-  console.log(currentStudents);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
     setCurrentPage(1);
   };
 
-  const handleEdit = (supervisor) => {
-    setEditingStudent({ ...supervisor });
-    setIsEditDialogOpen(true);
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      Swal.fire({
-        title: "Are you sure about deleting?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          const response = await fetch(
-            `http://localhost:3000/api/admin/supervisor/${id}`,
-            {
-              method: "DELETE",
-            }
-          );
-          if (!response.ok) {
-            throw new Error("Failed to delete supervisor");
-          }
-          fetchSupervisors();
-          Swal.fire({
-            title: "Deleted!",
-            text: "Supervisor details has been deleted",
-            icon: "success",
-          });
-        }
-      });
-    } catch (error) {
-      console.error("Error deleting supervisor:", error);
-    }
-  };
-
-  // const handleSaveEdit = async (id) => {
-  //   try {
-  //     const response = await fetch(
-  //       `http://localhost:3000/api/admin/supervisor/${id}`,
-  //       {
-  //         method: "PUT",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify(editingSupervisor),
-  //       }
-  //     );
-  //     if (!response.ok) {
-  //       throw new Error("Failed to update supervisor");
-  //     }
-  //     fetchSupervisors();
-  //     setEditingSupervisor(null);
-  //     setIsEditDialogOpen(false);
-  //     Swal.fire({
-  //       position: "center",
-  //       icon: "success",
-  //       title: "Supervisor details has been updated",
-  //       showConfirmButton: false,
-  //       timer: 1500,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error updating supervisor:", error);
-  //   }
-  // };
 
   const handleCancelEdit = () => {
     setEditingStudent(null);
@@ -246,6 +90,44 @@ function StudentsAdmin() {
     setCurrentPage(1);
   };
 
+  const handleEdit = (supervisor) => {
+    setEditingStudent({ ...supervisor });
+    setIsEditDialogOpen(true);
+  };
+
+    const handleDelete = async (id) => {
+      try {
+        Swal.fire({
+          title: "Are you sure about deleting?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            const response = await fetch(
+              `http://localhost:3000/api/admin/supervisor/${id}`,
+              {
+                method: "DELETE",
+              }
+            );
+            if (!response.ok) {
+              throw new Error("Failed to delete supervisor");
+            }
+            studentsPerSupervisor();
+            Swal.fire({
+              title: "Deleted!",
+              text: "Supervisor details has been deleted",
+              icon: "success",
+            });
+          }
+        });
+      } catch (error) {
+        console.error("Error deleting supervisor:", error);
+      }
+    };
+
   return (
     <div className="p-1 lg:p-10 min-h-screen bg-gray-50">
       <h1 className="text-3xl font-semibold md:text-4xl">All Students</h1>
@@ -269,10 +151,8 @@ function StudentsAdmin() {
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Student ID</TableHead>
-            <TableHead>Supervisor</TableHead>
             <TableHead>Semester</TableHead>
             <TableHead>Batch</TableHead>
-            <TableHead>Student Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -285,16 +165,9 @@ function StudentsAdmin() {
               <TableCell>{`${student.user.firstName} ${student.user.lastName}`}</TableCell>
               <TableCell>{student.user.email}</TableCell>
               <TableCell>{student.studentId}</TableCell>
-              <TableCell>
-              {`${student.supervisor.user.firstName} ${student.supervisor.user.lastName}`}
-              </TableCell>
               <TableCell>{student.semester}</TableCell>
               <TableCell>{student.batch}</TableCell>
-              <TableCell>
-                <Badge className={`${student.studentStatus === "pending" ? "bg-gray-200 text-gray-800 hover:bg-gray-500 hover:text-gray-50" : student.studentStatus === "approved" ? "bg-green-200 text-green-800 hover:bg-green-500 hover:text-green-50" : "bg-red-200 text-red-800 hover:bg-red-500 hover:text-red-50"}`}>
-                  {student.studentStatus}
-                </Badge>
-              </TableCell>
+              
               <TableCell>
                 <div className="flex items-center justify-center">
                   <Button
@@ -418,18 +291,6 @@ function StudentsAdmin() {
                 className="col-span-3"
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="designation" className="text-right">
-                Designation
-              </Label>
-              <Input
-                id="designation"
-                name="designation"
-                value={editingStudent?.designation || ""}
-                onChange={handleInputChange}
-                className="col-span-3"
-              />
-            </div>
           </div>
           <div className="flex justify-between w-full space-x-2">
             <Button
@@ -453,4 +314,4 @@ function StudentsAdmin() {
   );
 }
 
-export default StudentsAdmin;
+export default TotalStudents;

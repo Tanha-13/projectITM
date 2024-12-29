@@ -41,7 +41,6 @@ import Swal from "sweetalert2";
 import { Textarea } from "@/components/ui/textarea";
 import { setCurrentProject } from "@/redux/slice/projectSlice";
 
-
 function ProjectList() {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
@@ -56,8 +55,8 @@ function ProjectList() {
   const location = useLocation();
   const semesterData = location.state?.semesterData;
   const currentUser = useSelector((state) => state.auth.user);
-  const {semester} = useParams();
-  
+  const { semester } = useParams();
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -66,16 +65,15 @@ function ProjectList() {
       setFilteredProjects(semesterData.projects);
     }
   }, [semesterData]);
-  console.log(projects[0])
+  console.log(projects[0]);
 
   useEffect(() => {
     const filtered = projects.filter(
       (project) =>
         (project.name.toLowerCase().includes(search.toLowerCase()) ||
           project.title.toLowerCase().includes(search.toLowerCase()) ||
-          project.student.studentId.includes(search) || 
-          project.student.email.toLowerCase().includes(search.toLowerCase())) 
-          &&
+          project.student.studentId.includes(search) ||
+          project.student.email.toLowerCase().includes(search.toLowerCase())) &&
         (filterType === "all" || project.projectType === filterType) &&
         (filterStatus === "all" || project.status === filterStatus)
     );
@@ -154,13 +152,15 @@ function ProjectList() {
   const handleStatusChange = async (projectId, newStatus) => {
     try {
       // Optimistically update the UI
-      const updatedProjects = projects.map(project =>
+      const updatedProjects = projects.map((project) =>
         project._id === projectId ? { ...project, status: newStatus } : project
       );
       setProjects(updatedProjects);
-      setFilteredProjects(prevFilteredProjects =>
-        prevFilteredProjects.map(project =>
-          project._id === projectId ? { ...project, status: newStatus } : project
+      setFilteredProjects((prevFilteredProjects) =>
+        prevFilteredProjects.map((project) =>
+          project._id === projectId
+            ? { ...project, status: newStatus }
+            : project
         )
       );
 
@@ -188,12 +188,20 @@ function ProjectList() {
     } catch (error) {
       console.error("Error updating project status:", error);
       // Revert the changes if the API call fails
-      setProjects(prevProjects => prevProjects.map(project =>
-        project._id === projectId ? { ...project, status: project.status } : project
-      ));
-      setFilteredProjects(prevFilteredProjects => prevFilteredProjects.map(project =>
-        project._id === projectId ? { ...project, status: project.status } : project
-      ));
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project._id === projectId
+            ? { ...project, status: project.status }
+            : project
+        )
+      );
+      setFilteredProjects((prevFilteredProjects) =>
+        prevFilteredProjects.map((project) =>
+          project._id === projectId
+            ? { ...project, status: project.status }
+            : project
+        )
+      );
       Swal.fire({
         title: "Error",
         text: "Failed to update project status",
@@ -257,7 +265,6 @@ function ProjectList() {
 
   const handleViewProject = (project) => {
     dispatch(setCurrentProject(project));
-
   };
 
   return (
@@ -329,14 +336,19 @@ function ProjectList() {
               <TableCell>
                 <StatusBadge
                   status={project.status}
-                  onStatusChange={(newStatus) =>
-                    handleStatusChange(project._id, newStatus)
+                  onStatusChange={
+                    currentUser.role === "supervisor"
+                      ? (newStatus) =>
+                          handleStatusChange(project._id, newStatus)
+                      : undefined
                   }
                 />
               </TableCell>
               <TableCell>{`${project.semester} ${project.year}`}</TableCell>
-              <TableCell className="flex justify-center">
-                <Link to={`/${currentUser.role}/${currentUser.id}/projects/${semester}/${project._id}`}>
+              <TableCell className="">
+                <Link
+                  to={`/${currentUser.role}/${currentUser.id}/projects/${semester}/${project._id}`}
+                >
                   <Button
                     variant="internalBtn"
                     onClick={() => handleViewProject(project)}
@@ -347,8 +359,8 @@ function ProjectList() {
               </TableCell>
               {currentUser.role === "admin" && (
                 <TableCell>
-                  {project.supervisor?.firstName || "N/A"}{" "}
-                  {project.supervisor?.lastName || ""}
+                  {project.supervisor?.user?.firstName || "N/A"}{" "}
+                  {project.supervisor?.user?.lastName || ""}
                 </TableCell>
               )}
               <TableCell>
@@ -560,4 +572,3 @@ function ProjectList() {
 }
 
 export default ProjectList;
-

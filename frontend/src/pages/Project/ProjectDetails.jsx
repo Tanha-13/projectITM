@@ -393,14 +393,18 @@ function ProjectDetails() {
 
           <Card className="rounded-md bg-gray-50 mt-5 p-1 md:p-5">
             <h1 className="font-semibold text-xl md:text-2xl ">
-              Project Completion Work
+              {`${
+                project.projectType === "Project" ? "Project" : "Thesis"
+              } Completion Work`}
             </h1>
             <Separator className="mb-10" />
             <Card className="mb-6 max-w-5xl mx-auto">
               <CardContent className="p-2 md:p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-base md:text-xl font-semibold">
-                    Project Title
+                    {`${
+                      project.projectType === "Project" ? "Project" : "Thesis"
+                    } Title`}
                   </h3>
                   {currentUser.role === "student" && (
                     <Button
@@ -427,7 +431,7 @@ function ProjectDetails() {
                 <Input
                   value={projectTitle}
                   onChange={(e) => setProjectTitle(e.target.value)}
-                  placeholder="Enter project title"
+                  placeholder="Enter title"
                   disabled={currentUser.role != "student"}
                 />
               </CardContent>
@@ -437,7 +441,9 @@ function ProjectDetails() {
               <CardContent className="p-2 md:p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-base md:text-xl font-semibold">
-                    Project Overview
+                    {`${
+                      project.projectType === "Project" ? "Project" : "Thesis"
+                    } Description/Overview`}
                   </h3>
                   {currentUser.role === "student" && (
                     <Button
@@ -464,7 +470,7 @@ function ProjectDetails() {
                 <Textarea
                   value={projectOverview}
                   onChange={(e) => setProjectOverview(e.target.value)}
-                  placeholder="Enter project overview"
+                  placeholder="Enter overview/description"
                   rows={6}
                   disabled={currentUser.role != "student"}
                 />
@@ -475,7 +481,11 @@ function ProjectDetails() {
               <CardContent className="p-2 md:p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-base md:text-xl font-semibold">
-                    Functional Requirements
+                    {`${
+                      project.projectType === "Project"
+                        ? "Functional Requirements"
+                        : "Research Methodology"
+                    }`}
                   </h3>
                   {currentUser.role === "student" && (
                     <Button
@@ -506,7 +516,7 @@ function ProjectDetails() {
                 <Textarea
                   value={functionalRequirements}
                   onChange={(e) => setFunctionalRequirements(e.target.value)}
-                  placeholder="Enter functional requirements"
+                  placeholder="Enter details"
                   rows={15}
                   disabled={currentUser.role != "student"}
                 />
@@ -517,7 +527,11 @@ function ProjectDetails() {
               <CardContent className="p-2 md:p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-base md:text-xl font-semibold">
-                    Non-Functional Requirements
+                    {`${
+                      project.projectType === "Project"
+                        ? "Non-Functional Requirements"
+                        : "Results and Discussion"
+                    }`}
                   </h3>
                   {currentUser.role === "student" && (
                     <Button
@@ -548,253 +562,274 @@ function ProjectDetails() {
                 <Textarea
                   value={nonFunctionalRequirements}
                   onChange={(e) => setNonFunctionalRequirements(e.target.value)}
-                  placeholder="Enter non-functional requirements"
+                  placeholder="Enter details"
                   rows={10}
                   disabled={currentUser.role != "student"}
                 />
+              </CardContent>
+            </Card>
+
+            {project.projectType === "Project" && (
+              <div>
+                <Card className="mb-6 max-w-5xl mx-auto">
+                  <CardContent className="p-2 md:p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-base md:text-xl font-semibold">
+                        Use Case Diagram
+                      </h3>
+                      {currentUser.role === "student" && (
+                        <Button
+                          variant={
+                            completedSections.useCaseDiagram
+                              ? "outline"
+                              : "link"
+                          }
+                          onClick={() => handleMarkAsComplete("useCaseDiagram")}
+                          className={
+                            completedSections.useCaseDiagram
+                              ? "text-white"
+                              : "underline"
+                          }
+                        >
+                          {completedSections.useCaseDiagram ? (
+                            <>
+                              <FaCheck className="" /> Completed
+                            </>
+                          ) : (
+                            <p>Mark as Complete</p>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                    {useCaseDiagram ? (
+                      <div className="mt-4">
+                        <img
+                          src={getImageUrl(useCaseDiagram)}
+                          alt="Use Case Diagram"
+                          className="max-w-full mx-auto h-auto rounded-lg shadow-md"
+                        />
+                        {currentUser.role === "student" && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() =>
+                              handleRemoveFile(
+                                setUseCaseDiagram,
+                                "useCaseDiagram"
+                              )
+                            }
+                            className="mt-2"
+                          >
+                            <FaTrash className="mr-2" /> Remove
+                          </Button>
+                        )}
+                      </div>
+                    ) : currentUser.role === "student" ? (
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) =>
+                            handleFileChange(e, setUseCaseDiagram, 1024 * 1024)
+                          }
+                          className="hidden"
+                          id="use-case-upload"
+                        />
+                        <label
+                          htmlFor="use-case-upload"
+                          className="cursor-pointer"
+                        >
+                          <FaUpload className="mx-auto mb-2" size={24} />
+                          <p>Choose Use Case Diagram to upload (Max 1MB)</p>
+                        </label>
+                      </div>
+                    ) : (
+                      <div className="min-h-40 flex justify-center items-center text-red-700 font-medium text-lg">
+                        File has not been uploaded
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card className="mb-6 max-w-5xl mx-auto">
+                  <CardContent className="p-2 md:p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-base md:text-xl font-semibold">
+                        Entity Relation Diagram
+                      </h3>
+                      {currentUser.role === "student" && (
+                        <Button
+                          variant={
+                            completedSections.entityRelationDiagram
+                              ? "outline"
+                              : "link"
+                          }
+                          onClick={() =>
+                            handleMarkAsComplete("entityRelationDiagram")
+                          }
+                          className={
+                            completedSections.entityRelationDiagram
+                              ? "text-white"
+                              : "underline"
+                          }
+                        >
+                          {completedSections.entityRelationDiagram ? (
+                            <>
+                              <FaCheck className="" /> Completed
+                            </>
+                          ) : (
+                            <p>Mark as Complete</p>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+
+                    {entityRelationDiagram ? (
+                      <div className="mt-4">
+                        <img
+                          src={getImageUrl(entityRelationDiagram)}
+                          alt="Entity Relation Diagram"
+                          className="max-w-full mx-auto h-auto rounded-lg shadow-md"
+                        />
+                        {currentUser.role === "student" && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() =>
+                              handleRemoveFile(
+                                setEntityRelationDiagram,
+                                "entityRelationDiagram"
+                              )
+                            }
+                            className="mt-2"
+                          >
+                            <FaTrash className="mr-2" /> Remove
+                          </Button>
+                        )}
+                      </div>
+                    ) : currentUser.role === "student" ? (
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) =>
+                            handleFileChange(
+                              e,
+                              setEntityRelationDiagram,
+                              1024 * 1024
+                            )
+                          }
+                          className="hidden"
+                          id="er-diagram-upload"
+                        />
+                        <label
+                          htmlFor="er-diagram-upload"
+                          className="cursor-pointer"
+                        >
+                          <FaUpload className="mx-auto mb-2" size={24} />
+                          <p>
+                            Choose Entity Relation Diagram to upload (Max 1MB)
+                          </p>
+                        </label>
+                      </div>
+                    ) : (
+                      <div className="min-h-40 flex justify-center items-center text-red-700 font-medium text-lg">
+                        File has not been uploaded
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
                 
-              </CardContent>
-            </Card>
-
+              </div>
+            )}
             <Card className="mb-6 max-w-5xl mx-auto">
-              <CardContent className="p-2 md:p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-base md:text-xl font-semibold">
-                    Use Case Diagram
-                  </h3>
-                  {currentUser.role === "student" && (
-                    <Button
-                      variant={
-                        completedSections.useCaseDiagram ? "outline" : "link"
-                      }
-                      onClick={() => handleMarkAsComplete("useCaseDiagram")}
-                      className={
-                        completedSections.useCaseDiagram
-                          ? "text-white"
-                          : "underline"
-                      }
-                    >
-                      {completedSections.useCaseDiagram ? (
-                        <>
-                          <FaCheck className="" /> Completed
-                        </>
-                      ) : (
-                        <p>Mark as Complete</p>
+                  <CardContent className="p-2 md:p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-base md:text-xl font-semibold">
+                      {`${project.projectType === 'Project' ? "Documentation" : "Research Paper"}`}
+                      </h3>
+                      {currentUser.role === "student" && (
+                        <Button
+                          variant={
+                            completedSections.documentation ? "outline" : "link"
+                          }
+                          onClick={() => handleMarkAsComplete("documentation")}
+                          className={
+                            completedSections.documentation
+                              ? "text-white"
+                              : "underline"
+                          }
+                        >
+                          {completedSections.documentation ? (
+                            <>
+                              <FaCheck className="" /> Completed
+                            </>
+                          ) : (
+                            <p>Mark as Complete</p>
+                          )}
+                        </Button>
                       )}
-                    </Button>
-                  )}
-                </div>
-                {useCaseDiagram ? (
-                  <div className="mt-4">
-                    <img
-                      src={getImageUrl(useCaseDiagram)}
-                      alt="Use Case Diagram"
-                      className="max-w-full mx-auto h-auto rounded-lg shadow-md"
-                    />
-                    {currentUser.role === "student" && (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() =>
-                          handleRemoveFile(setUseCaseDiagram, "useCaseDiagram")
-                        }
-                        className="mt-2"
-                      >
-                        <FaTrash className="mr-2" /> Remove
-                      </Button>
+                    </div>
+
+                    {documentation ? (
+                      <div className="mt-4">
+                        <p
+                          className="hover:underline cursor-pointer"
+                          onClick={() =>
+                            window.open(
+                              `http://localhost:3000${documentation.path}`,
+                              "_blank"
+                            )
+                          }
+                        >
+                          {`${project?.student?.user?.firstName}-${project?.student?.user?.lastName}_${project?.student?.studentId}.pdf`}
+                        </p>
+                        {currentUser.role === "student" && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() =>
+                              handleRemoveFile(
+                                setDocumentation,
+                                "documentation"
+                              )
+                            }
+                            className="mt-2"
+                          >
+                            <FaTrash className="mr-2" /> Remove
+                          </Button>
+                        )}
+                      </div>
+                    ) : currentUser.role === "student" ? (
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
+                        <Input
+                          type="file"
+                          onChange={(e) =>
+                            handleFileChange(
+                              e,
+                              setDocumentation,
+                              2 * 1024 * 1024
+                            )
+                          }
+                          className="hidden"
+                          id="documentation-upload"
+                        />
+                        <label
+                          htmlFor="documentation-upload"
+                          className="cursor-pointer"
+                        >
+                          <FaUpload className="mx-auto mb-2" size={24} />
+                          <p>Choose Documentation to upload (Max 2MB)</p>
+                        </label>
+                      </div>
+                    ) : (
+                      <div className="min-h-40 flex justify-center items-center text-red-700 font-medium text-lg">
+                        File has not been uploaded
+                      </div>
                     )}
-                  </div>
-                ) : currentUser.role === "student" ? (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handleFileChange(e, setUseCaseDiagram, 1024 * 1024)
-                      }
-                      className="hidden"
-                      id="use-case-upload"
-                    />
-                    <label htmlFor="use-case-upload" className="cursor-pointer">
-                      <FaUpload className="mx-auto mb-2" size={24} />
-                      <p>Choose Use Case Diagram to upload (Max 1MB)</p>
-                    </label>
-                  </div>
-                ) : (
-                  <div className="min-h-40 flex justify-center items-center text-red-700 font-medium text-lg">
-                    File has not been uploaded
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="mb-6 max-w-5xl mx-auto">
-              <CardContent className="p-2 md:p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-base md:text-xl font-semibold">
-                    Entity Relation Diagram
-                  </h3>
-                  {currentUser.role === "student" && (
-                    <Button
-                      variant={
-                        completedSections.entityRelationDiagram
-                          ? "outline"
-                          : "link"
-                      }
-                      onClick={() =>
-                        handleMarkAsComplete("entityRelationDiagram")
-                      }
-                      className={
-                        completedSections.entityRelationDiagram
-                          ? "text-white"
-                          : "underline"
-                      }
-                    >
-                      {completedSections.entityRelationDiagram ? (
-                        <>
-                          <FaCheck className="" /> Completed
-                        </>
-                      ) : (
-                        <p>Mark as Complete</p>
-                      )}
-                    </Button>
-                  )}
-                </div>
-
-                {entityRelationDiagram ? (
-                  <div className="mt-4">
-                    <img
-                      src={getImageUrl(entityRelationDiagram)}
-                      alt="Entity Relation Diagram"
-                      className="max-w-full mx-auto h-auto rounded-lg shadow-md"
-                    />
-                    {currentUser.role === "student" && (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() =>
-                          handleRemoveFile(
-                            setEntityRelationDiagram,
-                            "entityRelationDiagram"
-                          )
-                        }
-                        className="mt-2"
-                      >
-                        <FaTrash className="mr-2" /> Remove
-                      </Button>
-                    )}
-                  </div>
-                ) : currentUser.role === "student" ? (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handleFileChange(
-                          e,
-                          setEntityRelationDiagram,
-                          1024 * 1024
-                        )
-                      }
-                      className="hidden"
-                      id="er-diagram-upload"
-                    />
-                    <label
-                      htmlFor="er-diagram-upload"
-                      className="cursor-pointer"
-                    >
-                      <FaUpload className="mx-auto mb-2" size={24} />
-                      <p>Choose Entity Relation Diagram to upload (Max 1MB)</p>
-                    </label>
-                  </div>
-                ) : (
-                  <div className="min-h-40 flex justify-center items-center text-red-700 font-medium text-lg">
-                    File has not been uploaded
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="mb-6 max-w-5xl mx-auto">
-              <CardContent className="p-2 md:p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-base md:text-xl font-semibold">
-                    Documentation
-                  </h3>
-                  {currentUser.role === "student" && (
-                    <Button
-                      variant={
-                        completedSections.documentation ? "outline" : "link"
-                      }
-                      onClick={() => handleMarkAsComplete("documentation")}
-                      className={
-                        completedSections.documentation
-                          ? "text-white"
-                          : "underline"
-                      }
-                    >
-                      {completedSections.documentation ? (
-                        <>
-                          <FaCheck className="" /> Completed
-                        </>
-                      ) : (
-                        <p>Mark as Complete</p>
-                      )}
-                    </Button>
-                  )}
-                </div>
-
-                {documentation ? (
-                  <div className="mt-4">
-                    <p
-                      className="hover:underline cursor-pointer"
-                      onClick={() =>
-                        window.open(
-                          `http://localhost:3000${documentation.path}`,
-                          "_blank"
-                        )
-                      }
-                    >
-                      {`${project?.student?.user?.firstName}-${project?.student?.user?.lastName}_${project?.student?.studentId}.pdf`}
-                    </p>
-                    {currentUser.role === "student" && (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() =>
-                          handleRemoveFile(setDocumentation, "documentation")
-                        }
-                        className="mt-2"
-                      >
-                        <FaTrash className="mr-2" /> Remove
-                      </Button>
-                    )}
-                  </div>
-                ) : currentUser.role === "student" ? (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors mb-4">
-                    <Input
-                      type="file"
-                      onChange={(e) =>
-                        handleFileChange(e, setDocumentation, 2 * 1024 * 1024)
-                      }
-                      className="hidden"
-                      id="documentation-upload"
-                    />
-                    <label
-                      htmlFor="documentation-upload"
-                      className="cursor-pointer"
-                    >
-                      <FaUpload className="mx-auto mb-2" size={24} />
-                      <p>Choose Documentation to upload (Max 2MB)</p>
-                    </label>
-                  </div>
-                ) : (
-                  <div className="min-h-40 flex justify-center items-center text-red-700 font-medium text-lg">
-                    File has not been uploaded
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
             {currentUser.role === "student" && (
               <div className="flex justify-center space-x-4">
                 <Button
@@ -865,17 +900,16 @@ function ProjectDetails() {
                         value={replyText}
                         onChange={(e) => setReplyText(e.target.value)}
                         rows={2}
-
                       />
                       <div className="flex">
-                      <Button
-                        onClick={() => handleReply(index)}
-                        className="mt-2"
-                        disabled={replyText.trim() === ""}
-                      >
-                        Reply
-                      </Button>
-                      {/* <Button
+                        <Button
+                          onClick={() => handleReply(index)}
+                          className="mt-2"
+                          disabled={replyText.trim() === ""}
+                        >
+                          Reply
+                        </Button>
+                        {/* <Button
                         onClick={() => handleModify(index)}
                         className="mt-2 ml-2"
                       >

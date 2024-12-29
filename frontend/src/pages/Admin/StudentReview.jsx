@@ -168,8 +168,8 @@ function StudentReview() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Student Review</h1>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger className="text-primary" value="pending">Pending Students</TabsTrigger>
+        <TabsList className="grid min-h-40 md:min-h-12 w-full md:grid-cols-3">
+          <TabsTrigger className="text-primary " value="pending">Pending Students</TabsTrigger>
           <TabsTrigger value="approved">Approved Students</TabsTrigger>
           <TabsTrigger value="declined">Declined Students</TabsTrigger>
         </TabsList>
