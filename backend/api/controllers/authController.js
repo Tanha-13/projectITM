@@ -27,11 +27,24 @@ const login = async (req, res, next) => {
     const validPassword = bcrypt.compareSync(password, validUser.password);
     if (!validPassword) return next(errorHandler(401, "Wrong credentials"));
     const Student = getStudentModel();
+    const Supervisor = getSupervisorModel();
     let studentDetails = null;
+    let supervisorDetails = null;
     if(validUser.role === "student"){
-      studentDetails = await Student.findOne({user:validUser._id}).populate("user")
+      studentDetails = await Student.findOne({user:validUser._id}).populate("user");
+      supervisorDetails = await Supervisor.findById(validUser.supervisor).populate({
+        path: "user",
+        select: "-password",
+      });
     }
     console.log(studentDetails);
+
+    if (validUser.role === "supervisor") {
+      supervisorDetails = await Supervisor.findOne({ user: validUser._id }).populate({
+        path: "user",
+        select: "-password",
+      });
+    }
 
     // jwt
     const token = signToken(validUser._id);
@@ -39,7 +52,8 @@ const login = async (req, res, next) => {
     const expiryDate = new Date(Date.now() + 3600000);
     const responseData = {
       ...rest,
-      studentDetails: studentDetails ? studentDetails.toObject() : null
+      studentDetails: studentDetails ? studentDetails.toObject() : null,
+      supervisorDetails: supervisorDetails ? supervisorDetails.toObject() : null,
     };
     res.cookie("access_token", token, { httpOnly: true, expires: expiryDate })
       .status(200)

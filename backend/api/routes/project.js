@@ -10,7 +10,5 @@ router.put('/:id', upload.fields([
     { name: 'entityRelationDiagram', maxCount: 1 },
     { name: 'documentation', maxCount: 1 }
   ]), updateProject);
-// router.delete('/:id', deleteProject);
-// router.get('/', getAllProjects);
 
 module.exports = router;

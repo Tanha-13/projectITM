@@ -12,7 +12,10 @@ app.use(cors());
 app.use(express.json());
 
 
-const _dirname = path.resolve();
+// const _dirname = path.resolve();
+
+app.use('/uploads', express.static(path.join(__dirname,'api','uploads')));
+
 
 //database connection
 const databaseConnection = async () => {
@@ -28,19 +31,6 @@ const databaseConnection = async () => {
   }
 };
 databaseConnection().then(() => {
-
-
-  // error handling middleware
-  app.use((err,req,res,next) => {
-    const statusCode = err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-    return res.status(statusCode).json({
-      success: false,
-      message,
-      statusCode
-    })
-
-  });
 
   //routing
   // auth routing
@@ -59,11 +49,27 @@ databaseConnection().then(() => {
   //project routing
   const projectRoutes = require("./api/routes/project");
   app.use("/api/projects",projectRoutes);
+
+
   
-  app.use(express.static(path.join(_dirname, "./frontend/dist")));
-  app.get('*',(req,res)=>{
-    res.sendFile(path.resolve(_dirname,"frontend","dist", "index.html"));
+  // app.use(express.static(path.join(_dirname, "./frontend/dist")));
+  // app.get('*',(req,res)=>{
+  //   res.sendFile(path.resolve(_dirname,"frontend","dist", "index.html"));
+  // });
+
+  
+
+  // error handling middleware
+  app.use((err,req,res,next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    return res.status(statusCode).json({
+      success: false,
+      message,
+      statusCode
+    })
   });
+
   // server
   const port = process.env.PORT || 5000;
   app.listen(port, () => {

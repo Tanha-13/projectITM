@@ -62,7 +62,10 @@ const styles = StyleSheet.create({
   },
 });
 
+
+
 function PdfFormat({ project }) {
+  console.log(project);
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -136,9 +139,7 @@ function PdfFormat({ project }) {
               <Text style={styles.projectTitle}>Use Case Diagram</Text>
               <Image
                 style={styles.image}
-                src={
-                  project.useCaseDiagram.preview || project.useCaseDiagram.path
-                }
+                src={project.useCaseDiagram.url || project.useCaseDiagram.preview}
               />
             </View>
           )}
@@ -151,10 +152,7 @@ function PdfFormat({ project }) {
               <Text style={styles.projectTitle}>Entity Relation Diagram</Text>
               <Image
                 style={styles.image}
-                src={
-                  project.entityRelationDiagram.preview ||
-                  project.entityRelationDiagram.path
-                }
+                src={project.entityRelationDiagram.url || project.entityRelationDiagram.preview}
               />
             </View>
           )}
@@ -167,5 +165,5 @@ function PdfFormat({ project }) {
 export default PdfFormat;
 
 PdfFormat.propTypes = {
-  project: PropTypes.obj,
+  project: PropTypes.any,
 };

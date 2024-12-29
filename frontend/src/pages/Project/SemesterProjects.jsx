@@ -170,7 +170,6 @@ function SemesterProjects() {
     );
   }
 
-  // Check if we're on a project list page
   const isProjectListPage = location.pathname.includes("/projects/");
 
   return (
