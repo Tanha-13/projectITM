@@ -61,7 +61,7 @@ const addSupervisor = async (req, res, next) => {
         from: process.env.USER_EMAIL,
         to: email,
         subject: "Your Supervisor Account",
-        text: `Hello ${firstName} ${lastName},\n\nYour supervisor account has been created for ProjectITM. Here are your credentials:\nYour email: ${email}\nYour Temporary Password: ${tempPassword}\n\nPlease change your password upon first login.\n\nThank you`,
+        text: `Hello ${firstName} ${lastName},\n\nYour supervisor account has been created for ProjectITM.\n\nHere are your credentials:\nYour email: ${email}\nYour Temporary Password: ${tempPassword}\n\nWelcome to ProjectITM - "https://projectitm.netlify.app/"\n\n\nThank you`,
       });
     } catch (emailError) {
       console.error("Error sending email:", emailError);
@@ -242,8 +242,6 @@ const allStudents = async (req, res, next) => {
   }
 };
 
-// approve students
-const approveStudents = async (req, res) => {};
 
 // update student status
 const updateStudentStatus = async (req, res, next) => {
@@ -317,6 +315,33 @@ const getStudentsByStatus = async (req, res, next) => {
     next(errorHandler(400, "Failed to load students data"));
   }
 };
+
+//delete student
+const deleteStudent = async(req,res,next) => {
+  try {
+    await connectToUserDB();
+    const User = getUserModel();
+    const Student = getStudentModel();
+    const { id } = req.params;
+
+    const student = await Student.findById(id);
+    if (!student) {
+      return res.status(404).json({ message: "Supervisor not found" });
+    }
+
+    // Delete supervisor
+    await Student.findByIdAndDelete(id);
+
+    // Delete associated user
+    await User.findByIdAndDelete(student.user);
+    res.status(200).json({ message: "Supervisor deleted successfully" });
+  } catch (error) {
+    console.error("Error in deleteSupervisor:", error);
+    res
+      .status(500)
+      .json({ message: "Error deleting supervisor", error: error.message });
+  }
+}
 
 // get semester projects
 const adminSemesterProjects = async (req, res, next) => {
@@ -421,9 +446,9 @@ module.exports = {
   deleteSupervisor,
   getStudentDetails,
   allStudents,
-  approveStudents,
   getStudentsByStatus,
   updateStudentStatus,
+  deleteStudent,
   adminSemesterProjects,
   projectList,
   projectDetails,

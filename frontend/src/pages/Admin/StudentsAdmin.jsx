@@ -168,7 +168,7 @@ function StudentsAdmin() {
       }).then(async (result) => {
         if (result.isConfirmed) {
           const response = await fetch(
-            `http://localhost:3000/api/admin/supervisor/${id}`,
+            `http://localhost:3000/api/admin/student/${id}`,
             {
               method: "DELETE",
             }
@@ -176,7 +176,7 @@ function StudentsAdmin() {
           if (!response.ok) {
             throw new Error("Failed to delete supervisor");
           }
-          fetchSupervisors();
+          fetchAllStudents();
           Swal.fire({
             title: "Deleted!",
             text: "Supervisor details has been deleted",
@@ -282,11 +282,11 @@ function StudentsAdmin() {
               <TableCell>
                 {(currentPage - 1) * studentPerPage + index + 1}
               </TableCell>
-              <TableCell>{`${student.user.firstName} ${student.user.lastName}`}</TableCell>
-              <TableCell>{student.user.email}</TableCell>
-              <TableCell>{student.studentId}</TableCell>
+              <TableCell>{`${student?.user?.firstName} ${student?.user?.lastName}`}</TableCell>
+              <TableCell>{student?.user?.email}</TableCell>
+              <TableCell>{student?.studentId}</TableCell>
               <TableCell>
-              {`${student.supervisor.user.firstName} ${student.supervisor.user.lastName}`}
+              {`${student?.supervisor?.user?.firstName} ${student?.supervisor?.user?.lastName}`}
               </TableCell>
               <TableCell>{student.semester}</TableCell>
               <TableCell>{student.batch}</TableCell>

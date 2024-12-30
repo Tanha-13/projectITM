@@ -13,6 +13,7 @@ export default function Login() {
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -49,6 +50,7 @@ export default function Login() {
     e.preventDefault();
     if (validateForm()) {
       try {
+        setLoading(true);
         const res = await fetch("http://localhost:3000/api/auth/login", {
           method: "POST",
           headers: {
@@ -102,6 +104,8 @@ export default function Login() {
       } catch (err) {
         console.error(err);
         setErrors({ general: "Invalid email or password" });
+      }finally{
+        setLoading(false);
       }
     }
   };
@@ -210,7 +214,7 @@ export default function Login() {
 
               <div>
                 <Button className="w-full" variant="internalBtn">
-                  Login
+                {`${loading ? "Loading..." : "Login"}`} 
                 </Button>
               </div>
             </form>

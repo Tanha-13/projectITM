@@ -18,6 +18,7 @@ const steps = [
 
 export default function Register() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [loading,setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -71,10 +72,10 @@ export default function Register() {
       if (!formData.email) {
         newErrors.email = "Student Email is required";
       } 
-      // else {
-      //   if (!formData.email.endsWith("@diu.edu.bd"))
-      //     newErrors.email = "Valid DIU email is required";
-      // }
+      else {
+        if (!formData.email.endsWith("@diu.edu.bd"))
+          newErrors.email = "Valid DIU email is required";
+      }
       if (!formData.studentId) {
         newErrors.studentId = "ID is required";
       } else {
@@ -122,6 +123,7 @@ export default function Register() {
   };
 
   const handleNext = () => {
+
     setIsSubmitted(true);
     if (validateStep()) {
       if (currentStep < steps.length - 1) {
@@ -138,6 +140,7 @@ export default function Register() {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
 
     if (validateStep()) {
@@ -178,6 +181,8 @@ export default function Register() {
         navigate("/");
       } catch (err) {
         console.log("error", err);
+      }finally{
+        setLoading(false);
       }
     }
   };
@@ -270,7 +275,7 @@ export default function Register() {
                 </Button>
               ) : (
                 <Button type="submit" variant="internalBtn" className="w-1/2">
-                  Register
+                {`${loading ? "Loading..." : "Register"}`}
                 </Button>
               )}
             </div>

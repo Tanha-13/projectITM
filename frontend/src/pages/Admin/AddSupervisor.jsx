@@ -24,6 +24,7 @@ export default function AddSupervisor() {
     tempPassword: "",
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   // const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -76,6 +77,7 @@ export default function AddSupervisor() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (validateForm()) {
       Swal.fire({
         title: "Do you want to create a supervisor account?",
@@ -126,6 +128,8 @@ export default function AddSupervisor() {
               "There was an issue creating the account.",
               "error"
             );
+          }finally{
+            setLoading(false);
           }
         } else if (result.isDenied) {
           Swal.fire("Changes are not added", "", "info");
@@ -249,7 +253,7 @@ export default function AddSupervisor() {
             </div>
 
             <Button variant="internalBtn" type="submit" className="w-full">
-              Add Supervisor
+            {`${loading ? "Loading..." : "Add Supervisor"}`} 
             </Button>
           </form>
         </CardContent>

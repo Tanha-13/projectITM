@@ -79,13 +79,13 @@ function SemesterProjects() {
   }, [userId, currentUser.role]);
   useEffect(() => {
     const groupedSemesters = projects.reduce((acc, project) => {
-      const key = `${project.student.semester}-${project.student.batch}`;
-      const projectType = project.projectType;
+      const key = `${project?.student?.semester}-${project?.student?.batch}`;
+      const projectType = project?.projectType;
 
       if (!acc[key]) {
         acc[key] = {
-          semester: project.student.semester,
-          batch: project.student.batch,
+          semester: project?.student?.semester,
+          batch: project?.student?.batch,
           projectCounts: {},
           projects: [],
         };
@@ -100,8 +100,8 @@ function SemesterProjects() {
 
     const groupedData = Object.values(groupedSemesters).map((group) => ({
       ...group,
-      totalProjects: group.projects.length,
-      projectTypeCounts: group.projectCounts,
+      totalProjects: group?.projects?.length,
+      projectTypeCounts: group?.projectCounts,
     }));
 
     // Sort groupedData by batch in ascending order
@@ -113,13 +113,13 @@ function SemesterProjects() {
     setSemesters(groupedData);
     setFilteredSemesters(groupedData);
     dispatch(totalSemesters(groupedData));
-  }, [projects,dispatch]);
+  }, [projects, dispatch]);
 
   useEffect(() => {
     const filtered = semesters.filter(
       (semester) =>
-        semester.semester.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        semester.batch.toLowerCase().includes(searchTerm.toLowerCase())
+        semester?.semester?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+        semester?.batch?.toLowerCase().includes(searchTerm?.toLowerCase())
     );
     setFilteredSemesters(filtered);
     setCurrentPage(1);
@@ -194,7 +194,7 @@ function SemesterProjects() {
                 <Card
                   key={index}
                   className={`cursor-pointer hover:shadow-md transition-shadow rounded-md border-t-4 ${
-                    semester.semester.toLowerCase().includes("spring")
+                    semester?.semester?.toLowerCase().includes("spring")
                       ? "border-t-secondary"
                       : "border-t-primary"
                   } bg-[linear-gradient(to_bottom,_#fff,#dbeafe)] flex flex-col`}
@@ -202,22 +202,22 @@ function SemesterProjects() {
                 >
                   <CardHeader className="flex items-center">
                     <CardTitle className="text-2xl font-bold">
-                      {semester.semester}
+                      {semester?.semester}
                     </CardTitle>
                     <CardDescription className="text-base">
-                      {semester.batch}
+                      {semester?.batch}
                     </CardDescription>
                   </CardHeader>
                   <div className="flex-grow"></div>
                   <CardContent
                     className={`overflow-hidden ${
-                      semester.semester.toLowerCase().includes("spring")
+                      semester?.semester?.toLowerCase().includes("spring")
                         ? "bg-primary"
                         : "bg-third"
                     } text-gray-50 font-medium flex items-center justify-around min-h-12 rounded-b-md`}
                   >
-                    <p>Projects: {semester.projectTypeCounts.Project || 0}</p>
-                    <p>Theses: {semester.projectTypeCounts.Thesis || 0}</p>
+                    <p>Projects: {semester?.projectTypeCounts?.Project || 0}</p>
+                    <p>Theses: {semester?.projectTypeCounts.Thesis || 0}</p>
                   </CardContent>
                 </Card>
               ))}
